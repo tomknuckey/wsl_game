@@ -158,3 +158,180 @@ def apply_manual_renames(pdf_long: pd.DataFrame, renames: dict) -> pd.DataFrame:
             logging.info(f"Applied manual rename: {msg}")
 
     return df
+
+
+def fill_missing_players(
+    pdf_long: pd.DataFrame,
+    pdf_reference: pd.DataFrame,
+    fill_with_players: list,
+) -> pd.DataFrame:
+    """Fill invalid player picks with random valid players from the fill list.
+
+    For each submitter, identifies any picks that are not in the reference sheet
+    and replaces them with a random player from ``fill_with_players``, ensuring
+    no duplicates within that submitter's picks.
+
+    Args:
+        pdf_long: Long-form DataFrame with columns ``name``, ``team_name``,
+            ``pick_slot``, and ``full_name``.
+        pdf_reference: Reference DataFrame with valid player names in ``full_name``.
+        fill_with_players: List of valid player names to use as replacements.
+
+    Returns:
+        Modified long-form DataFrame with invalid picks replaced.
+    """
+    import random
+
+    if not fill_with_players:
+        logging.info("No fill players provided; skipping fill process")
+        return pdf_long
+
+    df = pdf_long.copy()
+    df["full_name"] = df["full_name"].astype(str).str.strip()
+
+    # Get valid reference names
+    valid_names = set(
+        pdf_reference["full_name"].astype(str).str.strip()
+    )
+
+    # Process each submitter
+    for submitter_name in df["name"].unique():
+        submitter_df = df[df["name"] == submitter_name]
+        submitter_team = (
+            submitter_df["team_name"].iloc[0]
+            if len(submitter_df) > 0
+            else "<unknown>"
+        )
+        submitter_team = _safe_str(submitter_team, "")
+
+        # Get current valid picks for this submitter
+        current_picks = submitter_df[
+            submitter_df["full_name"].isin(valid_names)
+        ]["full_name"].unique()
+        current_picks_set = set(current_picks)
+
+        # Find invalid picks
+        invalid_rows = submitter_df[
+            ~submitter_df["full_name"].isin(valid_names)
+        ]
+
+        for idx, row in invalid_rows.iterrows():
+            old_player = row["full_name"]
+            team_ctx = f" (team: {submitter_team})" if submitter_team else ""
+
+            # Find a replacement from fill_with_players that isn't already picked
+            available = [
+                p
+                for p in fill_with_players
+                if p not in current_picks_set
+            ]
+
+            if not available:
+                logging.warning(
+                    f"{submitter_name}{team_ctx}: Could not find unique replacement "
+                    f"for '{old_player}' (all fill players already in picks)"
+                )
+                continue
+
+            new_player = random.choice(available)
+            df.loc[idx, "full_name"] = new_player
+            current_picks_set.add(new_player)
+
+            msg = (
+                f"{submitter_name}{team_ctx}: "
+                f"Replaced invalid '{old_player}' with '{new_player}'"
+            )
+            logging.info(msg)
+
+    return df
+
+
+def resolve_duplicates_in_picks(
+    pdf_long: pd.DataFrame,
+    pdf_reference: pd.DataFrame,
+    fill_with_players: list,
+) -> pd.DataFrame:
+    """Resolve any duplicate player picks within each submitter's picks.
+
+    For each submitter, identifies duplicate picks and reassigns all but one
+    to random available players from the fill list.
+
+    Args:
+        pdf_long: Long-form DataFrame with columns ``name``, ``team_name``,
+            ``pick_slot``, and ``full_name``.
+        pdf_reference: Reference DataFrame with valid player names in ``full_name``.
+        fill_with_players: List of valid player names to use as replacements.
+
+    Returns:
+        Modified long-form DataFrame with duplicate picks resolved.
+    """
+    import random
+
+    if not fill_with_players:
+        logging.info("No fill players provided; skipping duplicate resolution")
+        return pdf_long
+
+    df = pdf_long.copy()
+    df["full_name"] = df["full_name"].astype(str).str.strip()
+
+    # Get valid reference names
+    valid_names = set(
+        pdf_reference["full_name"].astype(str).str.strip()
+    )
+
+    # Process each submitter
+    for submitter_name in df["name"].unique():
+        submitter_mask = df["name"] == submitter_name
+        submitter_df = df[submitter_mask]
+        submitter_team = (
+            submitter_df["team_name"].iloc[0]
+            if len(submitter_df) > 0
+            else "<unknown>"
+        )
+        submitter_team = _safe_str(submitter_team, "")
+        team_ctx = f" (team: {submitter_team})" if submitter_team else ""
+
+        # Find duplicates within this submitter's picks
+        pick_counts = submitter_df["full_name"].value_counts()
+        duplicated_players = pick_counts[pick_counts > 1].index.tolist()
+
+        for dup_player in duplicated_players:
+            dup_mask = (df["name"] == submitter_name) & (
+                df["full_name"] == dup_player
+            )
+            dup_indices = df[dup_mask].index.tolist()
+
+            # Keep first occurrence, replace the rest
+            for idx in dup_indices[1:]:
+                # Get all currently valid picks for this submitter (after any replacements)
+                current_picks = df[
+                    (df["name"] == submitter_name)
+                    & (df["full_name"].isin(valid_names))
+                ]["full_name"].unique()
+                current_picks_set = set(current_picks)
+
+                # Find available replacements
+                available = [
+                    p
+                    for p in fill_with_players
+                    if p not in current_picks_set
+                ]
+
+                if not available:
+                    logging.warning(
+                        f"{submitter_name}{team_ctx}: Could not find replacement "
+                        f"for duplicate '{dup_player}' (all fill players in use)"
+                    )
+                    continue
+
+                new_player = random.choice(available)
+                df.loc[idx, "full_name"] = new_player
+                valid_names.add(new_player)
+
+                msg = (
+                    f"{submitter_name}{team_ctx}: "
+                    f"Resolved duplicate '{dup_player}' with '{new_player}'"
+                )
+                logging.info(msg)
+
+    return df

@@ -1,5 +1,11 @@
 import pandas as pd
-from config import data_source, manual_renaming_flag
+import random
+from config import (
+    data_source,
+    manual_renaming_flag,
+    player_fill_flag,
+    players_to_fill_with,
+)
 from utils.general_utils import (
     rename_form_columns,
     form_to_long,
@@ -8,6 +14,8 @@ from utils.general_utils import (
     adjust_goals,
     generate_results,
     apply_manual_renames,
+    fill_missing_players,
+    resolve_duplicates_in_picks,
 )
 from utils.validation_utils import run_validations
 from manual_updates import MANUAL_RENAMES
@@ -15,6 +23,9 @@ from manual_updates import MANUAL_RENAMES
 import logging
 
 logging.basicConfig(level=logging.INFO)
+random.seed(42)
+
+logging.info("Started Running")
 
 # Load form, rename columns, convert to long and clean
 pdf_form = (
@@ -28,8 +39,17 @@ pdf_form = (
 if manual_renaming_flag:
     pdf_form = pdf_form.pipe(apply_manual_renames, MANUAL_RENAMES)
 
-# Load reference and run validations using only the long form
+# Load reference
 pdf_reference = pd.read_csv(f"data/input/{data_source}/player_reference.csv")
+
+# Fill invalid picks with random players if enabled
+if player_fill_flag:
+    pdf_form = fill_missing_players(pdf_form, pdf_reference, players_to_fill_with)
+    pdf_form = resolve_duplicates_in_picks(
+        pdf_form, pdf_reference, players_to_fill_with
+    )
+
+# Run validations using only the long form
 
 errors, warnings = run_validations(pdf_form, pdf_reference)
 
@@ -63,3 +83,4 @@ pdf_combined = (
 pdf_results = generate_results(pdf_combined)
 
 pdf_results.to_csv(f"data/output/{data_source}/results.csv", index=False)
+logging.info("Results saved to CSV")
