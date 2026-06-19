@@ -1,0 +1,78 @@
+player_id,full_name,club,position,active
+WSL_0001,Alessia Russo,Arsenal,FW,TRUE
+WSL_0002,Beth Mead,Arsenal,FW,TRUE
+WSL_0003,Stina Blackstenius,Arsenal,FW,TRUE
+WSL_0004,Caitlin Foord,Arsenal,FW,TRUE
+WSL_0005,Mariona Caldentey,Arsenal,MF,TRUE
+WSL_0006,Frida Maanum,Arsenal,MF,TRUE
+WSL_0007,Leah Williamson,Arsenal,DF,TRUE
+WSL_0008,Lotte Wubben-Moy,Arsenal,DF,TRUE
+WSL_0009,Steph Catley,Arsenal,DF,TRUE
+WSL_0010,Emily Fox,Arsenal,DF,TRUE
+WSL_0011,Daphne van Domselaar,Arsenal,GK,TRUE
+
+WSL_0012,Lauren James,Chelsea,FW,TRUE
+WSL_0013,Sam Kerr,Chelsea,FW,TRUE
+WSL_0014,Sandy Baltimore,Chelsea,FW,TRUE
+WSL_0015,Mayra Ramirez,Chelsea,FW,TRUE
+WSL_0016,Guro Reiten,Chelsea,MF,TRUE
+WSL_0017,Erin Cuthbert,Chelsea,MF,TRUE
+WSL_0018,Keira Walsh,Chelsea,MF,TRUE
+WSL_0019,Niamh Charles,Chelsea,DF,TRUE
+WSL_0020,Lucy Bronze,Chelsea,DF,TRUE
+WSL_0021,Millie Bright,Chelsea,DF,TRUE
+WSL_0022,Hannah Hampton,Chelsea,GK,TRUE
+
+WSL_0023,Khadi Shaw,Manchester City,FW,TRUE
+WSL_0024,Lauren Hemp,Manchester City,FW,TRUE
+WSL_0025,Chloe Kelly,Manchester City,FW,TRUE
+WSL_0026,Vivianne Miedema,Manchester City,FW,TRUE
+WSL_0027,Aoba Fujino,Manchester City,FW,TRUE
+WSL_0028,Yui Hasegawa,Manchester City,MF,TRUE
+WSL_0029,Alex Greenwood,Manchester City,DF,TRUE
+WSL_0030,Laia Aleixandri,Manchester City,DF,TRUE
+WSL_0031,Kerstin Casparij,Manchester City,DF,TRUE
+WSL_0032,Ayaka Yamashita,Manchester City,GK,TRUE
+
+WSL_0033,Maya Le Tissier,Manchester United,DF,TRUE
+WSL_0034,Grace Clinton,Manchester United,MF,TRUE
+WSL_0035,Ella Toone,Manchester United,MF,TRUE
+WSL_0036,Leah Galton,Manchester United,FW,TRUE
+WSL_0037,Melvine Malard,Manchester United,FW,TRUE
+WSL_0038,Elisabeth Terland,Manchester United,FW,TRUE
+WSL_0039,Phallon Tullis-Joyce,Manchester United,GK,TRUE
+WSL_0040,Hannah Blundell,Manchester United,DF,TRUE
+
+WSL_0041,Heidi Logan,Tottenham Hotspur,DF,TRUE
+WSL_0042,Kit Graham,Tottenham Hotspur,FW,TRUE
+WSL_0043,Ashleigh Neville,Tottenham Hotspur,DF,TRUE
+WSL_0044,Grace Clinton (loan history note),Tottenham Hotspur,MF,TRUE
+WSL_0045,Jessica Naz,Tottenham Hotspur,FW,TRUE
+
+WSL_0046,Niamh Fahey,Liverpool,DF,TRUE
+WSL_0047,Ceri Holland,Liverpool,MF,TRUE
+WSL_0048,Leanne Kiernan,Liverpool,FW,TRUE
+WSL_0049,Sophie Roman Haug,Liverpool,FW,TRUE
+WSL_0050,Marie Hobinger,Liverpool,MF,TRUE
+
+WSL_0051,Megan Finnigan,Everton,DF,TRUE
+WSL_0052,Courtney Brosnan,Everton,GK,TRUE
+WSL_0053,Clare Wheeler,Everton,MF,TRUE
+WSL_0054,Katja Snoeijs,Everton,FW,TRUE
+WSL_0055,Veatriki Sarri,Everton,FW,TRUE
+
+WSL_0056,Fran Kirby,Brighton & Hove Albion,MF,TRUE
+WSL_0057,Nikita Parris,Brighton & Hove Albion,FW,TRUE
+WSL_0058,Maria Thorisdottir,Brighton & Hove Albion,DF,TRUE
+
+WSL_0059,Janina Leitzig,Leicester City,GK,TRUE
+WSL_0060,Sam Tierney,Leicester City,MF,TRUE
+WSL_0061,Jutta Rantala,Leicester City,FW,TRUE
+
+WSL_0062,Veronica Boquete,West Ham United,MF,TRUE
+WSL_0063,Hawa Cissoko,West Ham United,DF,TRUE
+WSL_0064,Kristie Mewis,West Ham United,MF,TRUE
+
+WSL_0065,Alisha Lehmann,Aston Villa,FW,TRUE
+WSL_0066,Rachel Daly,Aston Villa,FW,TRUE
+WSL_0067,Jordan Nobbs,Aston Villa,MF,TRUE
