@@ -1,4 +1,9 @@
 Timestamp,Your Full Name,"Player 1 
-Enter full player name exactly as shown in the reference sheet (INSERT LINK)",Player 2,Player 3,Player 4,Player 5
-18/06/2026 17:17:41,TEMP,Alessia Russo,Lauren James,Beth Mead,Lauren Hemp,Ella Toone
-18/06/2026 17:18:52,TEMP_2,Georgia Stanway,Vivianne Miedema,Lauren Hemp,Alessia Russo,Keira Walsh
+Enter full player name exactly as shown in the reference sheet, as defined at the top","Player 2
+Enter full player name exactly as shown in the reference sheet, as defined at the top","Player 3
+Enter full player name exactly as shown in the reference sheet, as defined at the top","Player 4
+Enter full player name exactly as shown in the reference sheet, as defined at the top","Player 5
+Enter full player name exactly as shown in the reference sheet, as defined at the top",Are you happy to be contacted if there's issues with your answers,Contact Information (Email / Whatsapp),Team Name
+18/06/2026 17:17:41,TEMP,Alessia Russo,Lauren James,Beth Mead,Lauren Hemp,Ella Toone,,,
+18/06/2026 17:18:52,TEMP_2,Georgia Stanway,Vivianne Miedema,Lauren Hemp,Alessia Russo,Keira Walsh,,,
+19/06/2026 14:00:31,TEMP_3,a,b,Lauren James,Lauren James,c,Yes,,TEMP_3

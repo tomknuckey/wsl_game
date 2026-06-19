@@ -1,2 +1,4 @@
 # Data source directory name
-source: str = "test"
+data_source: str = "test"
+
+manual_renaming_flag: bool = True
