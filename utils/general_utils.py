@@ -335,3 +335,32 @@ def resolve_duplicates_in_picks(
                 logging.info(msg)
 
     return df
+
+def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
+    """Load and aggregate goal data across multiple gameweeks.
+
+    Reads goal CSVs from ``data/input/{data_source}/player_goals/GW_*.csv``
+    for gameweeks 1 through ``max_gw``. Missing files are skipped silently.
+
+    Args:
+        max_gw: Maximum gameweek number to attempt to load (exclusive).
+        data_source: Directory name containing the player goals subdirectory.
+
+    Returns:
+        DataFrame with columns ``player_id`` and ``goals`` (aggregated across all GWs).
+    """
+    pdf_goals = []
+
+    for gw in range(1, max_gw):
+        file_path = f"data/input/{data_source}/player_goals/GW_{gw}.csv"
+        
+        try:
+            pdf_temp = pd.read_csv(file_path)
+            pdf_temp["gw"] = gw 
+            pdf_goals.append(pdf_temp)
+        except FileNotFoundError:
+            pass  # skips missing GW files
+
+    pdf_goals = pd.concat(pdf_goals, ignore_index=True)
+
+    return pdf_goals.groupby("player_id").agg({"goals": "sum"}).reset_index()

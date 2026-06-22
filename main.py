@@ -5,8 +5,10 @@ from config import (
     manual_renaming_flag,
     player_fill_flag,
     players_to_fill_with,
+    max_gw,
 )
 from utils.general_utils import (
+    generate_goals,
     rename_form_columns,
     form_to_long,
     clean_form_data,
@@ -70,12 +72,10 @@ pdf_prep = pdf_reference.merge(pdf_form, how="inner", on="full_name")
 
 pdf_pics = number_of_pics(pdf_prep)
 
-pdf_goals = pd.read_csv(
-    f"data/input/{data_source}/player_goals/GW_1.csv"
-)  # TODO - Generate function for multiple
+pdf_goals_agg = generate_goals(max_gw, data_source)
 
 pdf_combined = (
-    pdf_prep.merge(pdf_goals, how="left", on="player_id")
+    pdf_prep.merge(pdf_goals_agg, how="left", on="player_id")
     .merge(pdf_pics, how="left", on="player_id")
     .pipe(adjust_goals)
 )

@@ -7,3 +7,6 @@ manual_renaming_flag: bool = True
 player_fill_flag: bool = True
 
 players_to_fill_with: list = ["Alessia Russo", "Lauren James", "Ella Toone", "Beth Mead", "Mariona Caldentey"]
+
+#Maximum Number of gameweeks to filter on
+max_gw = 30
