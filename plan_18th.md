@@ -1,26 +1,39 @@
-1. Tidy up Repo - Done
-1.5 Create test folder for data - Done
-Turn into .py - Done
-Have folder as input - Done
-Get black in - Done
-2. Put on Git - Done
-3. Improve Form 
-    * make it clearer - Done
-    * Add in contact information
-    * User guide
+### Done
 
-3.5 Put in code that captalise it, so then it matches
-4. Add in python checks after / within form - DONE
-4.5 Add in code that does manual updates based on clarification - DONE
-4.75 Add in code that deals with duplicate player names / team names - DONE
-Add in code that spots duplicate entries - DONE
-5. Make sure form is idiot proof 
-5.5 Add in code to give random players if doesn't work - DONE
-6. Work out how to create player reference sheet.
-7. Create backup architecture
-7.5 version tagging
-8. Set up process for different game weeks plots
-9. Create unit tests
-10. Work out how to do plotting / whatsapp message
-11. Branching strategy, e.g Dev / Test / Prod 
-12. Create intermediate outputs e.g aggregated goals / updated pics after validation
+* Tidy up Repo
+* Create test folder for data
+* Turn into .py -
+* Have folder as input 
+* Get black in -
+* Add in python checks after / within form - DONE
+* Put on Git
+* Add in code that does manual updates based on spelling clarification
+* Add in code that deals with duplicate player names / team names and give random players 
+* Create player reference sheet
+* Add checks on reference sheet, e.g no duplicates no captains, no country, no on loan from
+
+### TODO
+**Improve Form** 
+
+* make it clearer
+* Add in contact information
+* User guide
+
+* Put in code that makes player name always capital so it matches
+
+* Create data backup architecture
+* version tagging
+* Set up process for different game weeks plots
+* Create unit tests
+* Work out how to do plotting / whatsapp message
+* Branching strategy, e.g Dev / Test / Prod 
+* Create intermediate outputs e.g aggregated goals / updated pics after validation
+* Create way of manually overwriting for just one person - e.g an individual has realised that a player has transffered out
+* Test it breaks for duplicate team names / player names
+* Filter out any outputs after the deadline 
+* Communication strategy - one whatsapp group?
+* Allow functionality to filter out TEMP_ in the actual game
+
+* Update player reference sheet with new transfers 
+* Test player reference sheet with other users inserting things
+* Add good way of making updates to reference sheet 

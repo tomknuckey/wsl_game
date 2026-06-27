@@ -1,78 +1,334 @@
-player_id,full_name,club,position,active
-WSL_0001,Alessia Russo,Arsenal,FW,TRUE
-WSL_0002,Beth Mead,Arsenal,FW,TRUE
-WSL_0003,Stina Blackstenius,Arsenal,FW,TRUE
-WSL_0004,Caitlin Foord,Arsenal,FW,TRUE
-WSL_0005,Mariona Caldentey,Arsenal,MF,TRUE
-WSL_0006,Frida Maanum,Arsenal,MF,TRUE
-WSL_0007,Leah Williamson,Arsenal,DF,TRUE
-WSL_0008,Lotte Wubben-Moy,Arsenal,DF,TRUE
-WSL_0009,Steph Catley,Arsenal,DF,TRUE
-WSL_0010,Emily Fox,Arsenal,DF,TRUE
-WSL_0011,Daphne van Domselaar,Arsenal,GK,TRUE
-
-WSL_0012,Lauren James,Chelsea,FW,TRUE
-WSL_0013,Sam Kerr,Chelsea,FW,TRUE
-WSL_0014,Sandy Baltimore,Chelsea,FW,TRUE
-WSL_0015,Mayra Ramirez,Chelsea,FW,TRUE
-WSL_0016,Guro Reiten,Chelsea,MF,TRUE
-WSL_0017,Erin Cuthbert,Chelsea,MF,TRUE
-WSL_0018,Keira Walsh,Chelsea,MF,TRUE
-WSL_0019,Niamh Charles,Chelsea,DF,TRUE
-WSL_0020,Lucy Bronze,Chelsea,DF,TRUE
-WSL_0021,Millie Bright,Chelsea,DF,TRUE
-WSL_0022,Hannah Hampton,Chelsea,GK,TRUE
-
-WSL_0023,Khadi Shaw,Manchester City,FW,TRUE
-WSL_0024,Lauren Hemp,Manchester City,FW,TRUE
-WSL_0025,Chloe Kelly,Manchester City,FW,TRUE
-WSL_0026,Vivianne Miedema,Manchester City,FW,TRUE
-WSL_0027,Aoba Fujino,Manchester City,FW,TRUE
-WSL_0028,Yui Hasegawa,Manchester City,MF,TRUE
-WSL_0029,Alex Greenwood,Manchester City,DF,TRUE
-WSL_0030,Laia Aleixandri,Manchester City,DF,TRUE
-WSL_0031,Kerstin Casparij,Manchester City,DF,TRUE
-WSL_0032,Ayaka Yamashita,Manchester City,GK,TRUE
-
-WSL_0033,Maya Le Tissier,Manchester United,DF,TRUE
-WSL_0034,Grace Clinton,Manchester United,MF,TRUE
-WSL_0035,Ella Toone,Manchester United,MF,TRUE
-WSL_0036,Leah Galton,Manchester United,FW,TRUE
-WSL_0037,Melvine Malard,Manchester United,FW,TRUE
-WSL_0038,Elisabeth Terland,Manchester United,FW,TRUE
-WSL_0039,Phallon Tullis-Joyce,Manchester United,GK,TRUE
-WSL_0040,Hannah Blundell,Manchester United,DF,TRUE
-
-WSL_0041,Heidi Logan,Tottenham Hotspur,DF,TRUE
-WSL_0042,Kit Graham,Tottenham Hotspur,FW,TRUE
-WSL_0043,Ashleigh Neville,Tottenham Hotspur,DF,TRUE
-WSL_0044,Grace Clinton (loan history note),Tottenham Hotspur,MF,TRUE
-WSL_0045,Jessica Naz,Tottenham Hotspur,FW,TRUE
-
-WSL_0046,Niamh Fahey,Liverpool,DF,TRUE
-WSL_0047,Ceri Holland,Liverpool,MF,TRUE
-WSL_0048,Leanne Kiernan,Liverpool,FW,TRUE
-WSL_0049,Sophie Roman Haug,Liverpool,FW,TRUE
-WSL_0050,Marie Hobinger,Liverpool,MF,TRUE
-
-WSL_0051,Megan Finnigan,Everton,DF,TRUE
-WSL_0052,Courtney Brosnan,Everton,GK,TRUE
-WSL_0053,Clare Wheeler,Everton,MF,TRUE
-WSL_0054,Katja Snoeijs,Everton,FW,TRUE
-WSL_0055,Veatriki Sarri,Everton,FW,TRUE
-
-WSL_0056,Fran Kirby,Brighton & Hove Albion,MF,TRUE
-WSL_0057,Nikita Parris,Brighton & Hove Albion,FW,TRUE
-WSL_0058,Maria Thorisdottir,Brighton & Hove Albion,DF,TRUE
-
-WSL_0059,Janina Leitzig,Leicester City,GK,TRUE
-WSL_0060,Sam Tierney,Leicester City,MF,TRUE
-WSL_0061,Jutta Rantala,Leicester City,FW,TRUE
-
-WSL_0062,Veronica Boquete,West Ham United,MF,TRUE
-WSL_0063,Hawa Cissoko,West Ham United,DF,TRUE
-WSL_0064,Kristie Mewis,West Ham United,MF,TRUE
-
-WSL_0065,Alisha Lehmann,Aston Villa,FW,TRUE
-WSL_0066,Rachel Daly,Aston Villa,FW,TRUE
-WSL_0067,Jordan Nobbs,Aston Villa,MF,TRUE
+full_name,team,player_id
+Emily Fox,Arsenal,WSL_0001
+Lotte Wubben-Moy,Arsenal,WSL_0002
+Laia Codina,Arsenal,WSL_0003
+Leah Williamson,Arsenal,WSL_0004
+Steph Catley,Arsenal,WSL_0005
+Katie McCabe,Arsenal,WSL_0006
+Taylor Hinds,Arsenal,WSL_0007
+Katie Reid,Arsenal,WSL_0008
+Smilla Holmberg,Arsenal,WSL_0009
+Sophie Harwood,Arsenal,WSL_0010
+Mariona Caldentey,Arsenal,WSL_0011
+Kim Little,Arsenal,WSL_0012
+Frida Maanum,Arsenal,WSL_0013
+Kyra Cooney-Cross,Arsenal,WSL_0014
+Olivia Smith,Arsenal,WSL_0015
+Chloe Kelly,Arsenal,WSL_0016
+Caitlin Foord,Arsenal,WSL_0017
+Alessia Russo,Arsenal,WSL_0018
+Stina Blackstenius,Arsenal,WSL_0019
+Michelle Agyemang,Arsenal,WSL_0020
+Sabrina D'Angelo,Aston Villa,WSL_0021
+Ellie Roebuck,Aston Villa,WSL_0022
+Lily Clark,Aston Villa,WSL_0023
+Anna Patten,Aston Villa,WSL_0024
+Lynn Wilms,Aston Villa,WSL_0025
+Lucy Parker,Aston Villa,WSL_0026
+Noelle Maritz,Aston Villa,WSL_0027
+Océane Deslandes,Aston Villa,WSL_0028
+Jenna Nighswonger,Aston Villa,WSL_0029
+Rachel Maltby,Aston Villa,WSL_0030
+Katie Scott,Aston Villa,WSL_0031
+Lucy Staniforth,Aston Villa,WSL_0032
+Oriane Jean-François,Aston Villa,WSL_0033
+Missy Bo Kearns,Aston Villa,WSL_0034
+Jill Baijings,Aston Villa,WSL_0035
+Lucia Kendall,Aston Villa,WSL_0036
+Miri Taylor,Aston Villa,WSL_0037
+Rachel Daly,Aston Villa,WSL_0038
+Gabi Nunes,Aston Villa,WSL_0039
+Maya Hijikata,Aston Villa,WSL_0040
+Ebony Salmon,Aston Villa,WSL_0041
+Georgia Mullett,Aston Villa,WSL_0042
+Chasity Grant,Aston Villa,WSL_0043
+Lucy Thomas,Birmingham City,WSL_0044
+Martha Harris,Birmingham City,WSL_0045
+Michaela Kovacs,Birmingham City,WSL_0046
+Shannon Cooke,Birmingham City,WSL_0047
+Lee Geum-min,Birmingham City,WSL_0048
+Wilma Leidhammar,Birmingham City,WSL_0049
+Simone Magill,Birmingham City,WSL_0050
+Rebecca Holloway,Birmingham City,WSL_0051
+Lily Crosthwaite,Birmingham City,WSL_0052
+Chelsea Cornet,Birmingham City,WSL_0053
+Rebecca McKenna,Birmingham City,WSL_0054
+Océane Hurtré,Birmingham City,WSL_0055
+Asato Miyagawa,Birmingham City,WSL_0056
+Veatriki Sarri,Birmingham City,WSL_0057
+Batcheba Louis,Birmingham City,WSL_0058
+Neve Herron,Birmingham City,WSL_0059
+Ava Baker,Birmingham City,WSL_0060
+Ebonie Locke,Birmingham City,WSL_0061
+Chiamaka Nnadozie,Brighton and Hove Albion,WSL_0062
+Manuela Vanegas,Brighton and Hove Albion,WSL_0063
+Moeka Minami,Brighton and Hove Albion,WSL_0064
+Maelys Mpomé,Brighton and Hove Albion,WSL_0065
+Aisha Masaka,Brighton and Hove Albion,WSL_0066
+Maisie Symonds,Brighton and Hove Albion,WSL_0067
+Jelena Čanković,Brighton and Hove Albion,WSL_0068
+Kiko Seike,Brighton and Hove Albion,WSL_0069
+Fran Kirby,Brighton and Hove Albion,WSL_0070
+Nadine Noordam,Brighton and Hove Albion,WSL_0071
+Bex Rayner,Brighton and Hove Albion,WSL_0072
+Caitlin Hayes,Brighton and Hove Albion,WSL_0073
+Marisa Olislagers,Brighton and Hove Albion,WSL_0074
+Olaug Tvedten,Brighton and Hove Albion,WSL_0075
+Madison Haley,Brighton and Hove Albion,WSL_0076
+Carla Camacho,Brighton and Hove Albion,WSL_0077
+Marit Auée,Brighton and Hove Albion,WSL_0078
+Hannah Poulter,Brighton and Hove Albion,WSL_0079
+Rachel McLauchlan,Brighton and Hove Albion,WSL_0080
+Melina Loeck,Brighton and Hove Albion,WSL_0081
+Fuka Tsunoda,Brighton and Hove Albion,WSL_0082
+Charlize Rule,Brighton and Hove Albion,WSL_0083
+Olivia Johnson,Brighton and Hove Albion,WSL_0084
+Emilie Joramo,Brighton and Hove Albion,WSL_0085
+Sophie Whitehouse,Charlton Athletic,WSL_0086
+Ellie Mason,Charlton Athletic,WSL_0087
+Charlotte Newsham,Charlton Athletic,WSL_0088
+Mia Ross,Charlton Athletic,WSL_0089
+Elisha N'Dow,Charlton Athletic,WSL_0090
+Katie Bradley,Charlton Athletic,WSL_0091
+Carla Humphrey,Charlton Athletic,WSL_0092
+Gillian Kenney,Charlton Athletic,WSL_0093
+Lucy Fitzgerald,Charlton Athletic,WSL_0094
+Jodie Hutton,Charlton Athletic,WSL_0095
+Katie Lockwood,Charlton Athletic,WSL_0096
+Kiera Skeels,Charlton Athletic,WSL_0097
+Gloria Siber,Charlton Athletic,WSL_0098
+Mary McAteer,Charlton Athletic,WSL_0099
+Anna Pederson,Charlton Athletic,WSL_0100
+Lucia Lobato,Charlton Athletic,WSL_0101
+Lizzie Waldie,Charlton Athletic,WSL_0102
+Livia Peng,Chelsea,WSL_0103
+Ellie Carpenter,Chelsea,WSL_0104
+Millie Bright,Chelsea,WSL_0105
+Veerle Buurman,Chelsea,WSL_0106
+Sjoeke Nüsken,Chelsea,WSL_0107
+Mayra Ramírez,Chelsea,WSL_0108
+Erin Cuthbert,Chelsea,WSL_0109
+Lauren James,Chelsea,WSL_0110
+Alyssa Thompson,Chelsea,WSL_0111
+Nathalie Björn,Chelsea,WSL_0112
+Naomi Girma,Chelsea,WSL_0113
+Sandy Baltimore,Chelsea,WSL_0114
+Wieke Kaptein,Chelsea,WSL_0115
+Johanna Rytting Kaneryd,Chelsea,WSL_0116
+Niamh Charles,Chelsea,WSL_0117
+Lucy Bronze,Chelsea,WSL_0118
+Hannah Hampton,Chelsea,WSL_0119
+Kadeisha Buchanan,Chelsea,WSL_0120
+Keira Walsh,Chelsea,WSL_0121
+Lexi Potter,Chelsea,WSL_0122
+Aggie Beever-Jones,Chelsea,WSL_0123
+Becky Spencer,Chelsea,WSL_0124
+Chloe Sarwie,Chelsea,WSL_0125
+Brooke Aspin,Chelsea,WSL_0126
+Jamie-Lee Napier,Crystal Palace,WSL_0127
+My Cato,Crystal Palace,WSL_0128
+Aimee Everett,Crystal Palace,WSL_0129
+Molly-Mae Sharpe,Crystal Palace,WSL_0130
+Elise Hughes,Crystal Palace,WSL_0131
+Kirsty Howat,Crystal Palace,WSL_0132
+Ashleigh Weerden,Crystal Palace,WSL_0133
+Josie Green,Crystal Palace,WSL_0134
+Hayley Nolan,Crystal Palace,WSL_0135
+Hayley Ladd,Crystal Palace,WSL_0136
+Annabel Blanchard,Crystal Palace,WSL_0137
+Justine Vanhaevermaet,Crystal Palace,WSL_0138
+Kelly Brady,Crystal Palace,WSL_0139
+Abbie Larkin,Crystal Palace,WSL_0140
+Allyson Swaby,Crystal Palace,WSL_0141
+Shae Yáñez,Crystal Palace,WSL_0142
+Emila Brown,Crystal Palace,WSL_0143
+Courtney Brosnan,Everton,WSL_0144
+Hannah Blundell,Everton,WSL_0145
+Rion Ishikawa,Everton,WSL_0146
+Martina Fernández,Everton,WSL_0147
+Honoka Hayashi,Everton,WSL_0148
+Clare Wheeler,Everton,WSL_0149
+Rosa van Gool,Everton,WSL_0150
+Toni Payne,Everton,WSL_0151
+Inma Gabarro,Everton,WSL_0152
+Kelly Gago,Everton,WSL_0153
+Emily Ramsey,Everton,WSL_0154
+Hikaru Kitagawa,Everton,WSL_0155
+Melissa Lawley,Everton,WSL_0156
+Laila Harbert,Everton,WSL_0157
+Lucy Hope,Everton,WSL_0158
+Ornella Vignola,Everton,WSL_0159
+Megan Finnigan,Everton,WSL_0160
+Zara Kramžar,Everton,WSL_0161
+Aurora Galli,Everton,WSL_0162
+Katja Snoeijs,Everton,WSL_0163
+Elise Stenevik,Everton,WSL_0164
+Karen Holmgaard,Everton,WSL_0165
+Yūka Momiki,Everton,WSL_0166
+Ruby Mace,Everton,WSL_0167
+Macy Settle,Everton,WSL_0168
+Maz Pacheco,Everton,WSL_0169
+Ellie Jones,Everton,WSL_0170
+Rachael Laws,Liverpool,WSL_0171
+Lucy Parry,Liverpool,WSL_0172
+Gemma Evans,Liverpool,WSL_0173
+Grace Fisk,Liverpool,WSL_0174
+Risa Shimizu,Liverpool,WSL_0175
+Denise O'Sullivan,Liverpool,WSL_0176
+Cornelia Kapocs,Liverpool,WSL_0177
+Fūka Nagano,Liverpool,WSL_0178
+Sophie Román Haug,Liverpool,WSL_0179
+Beata Olsson,Liverpool,WSL_0180
+Mia Enderby,Liverpool,WSL_0181
+Marie Höbinger,Liverpool,WSL_0182
+Sofie Lundgaard,Liverpool,WSL_0183
+Lily Woodham,Liverpool,WSL_0184
+Jenna Clark,Liverpool,WSL_0185
+Ceri Holland,Liverpool,WSL_0186
+Kirsty Maclean,Liverpool,WSL_0187
+Anna Jøsendal,Liverpool,WSL_0188
+Faye Kirby,Liverpool,WSL_0189
+Gemma Bonner,Liverpool,WSL_0190
+Sam Kerr,Liverpool,WSL_0191
+Alice Bergström,Liverpool,WSL_0192
+Aurélie Csillag,Liverpool,WSL_0193
+Jennifer Falk,Liverpool,WSL_0194
+Alejandra Bernabé,Liverpool,WSL_0195
+Zara Shaw,Liverpool,WSL_0196
+Jana Fernández,London City Lionesses,WSL_0197
+Poppy Pattinson,London City Lionesses,WSL_0198
+Isa Kardinaal,London City Lionesses,WSL_0199
+Teyah Goldie,London City Lionesses,WSL_0200
+María Pérez,London City Lionesses,WSL_0201
+Lucía Corrales,London City Lionesses,WSL_0202
+Saki Kumagai,London City Lionesses,WSL_0203
+Kosovare Asllani,London City Lionesses,WSL_0204
+Daniëlle van de Donk,London City Lionesses,WSL_0205
+Paula Partido,London City Lionesses,WSL_0206
+Elena Linari,London City Lionesses,WSL_0207
+Freya Godfrey,London City Lionesses,WSL_0208
+Sanni Franssi,London City Lionesses,WSL_0209
+Nikita Parris,London City Lionesses,WSL_0210
+Lotta Lindström,London City Lionesses,WSL_0211
+Delphine Cascarino,London City Lionesses,WSL_0212
+Cerys Brown,London City Lionesses,WSL_0213
+Isobel Goodwin,London City Lionesses,WSL_0214
+Rofiat Imuran,London City Lionesses,WSL_0215
+Mary Earps,London City Lionesses,WSL_0216
+Sophie Hillyerd,London City Lionesses,WSL_0217
+Malou Marcetto,London City Lionesses,WSL_0218
+Emily Orman,London City Lionesses,WSL_0219
+Alanna Kennedy,London City Lionesses,WSL_0220
+Sophia Poor,London City Lionesses,WSL_0221
+Elene Lete,London City Lionesses,WSL_0222
+Grace Geyoro,London City Lionesses,WSL_0223
+Eartha Cumings,Manchester City,WSL_0224
+Naomi Layzell,Manchester City,WSL_0225
+Jade Rose,Manchester City,WSL_0226
+Alex Greenwood,Manchester City,WSL_0227
+Grace Clinton,Manchester City,WSL_0228
+Beth Mead,Manchester City,WSL_0229
+Mary Fowler,Manchester City,WSL_0230
+Khadija Shaw,Manchester City,WSL_0231
+Vivianne Miedema,Manchester City,WSL_0232
+Lauren Hemp,Manchester City,WSL_0233
+Laura Wienroither,Manchester City,WSL_0234
+Kerolin,Manchester City,WSL_0235
+Leila Ouahabi,Manchester City,WSL_0236
+Sam Coffey,Manchester City,WSL_0237
+Kerstin Casparij,Manchester City,WSL_0238
+Laura Blindkilde Brown,Manchester City,WSL_0239
+Aoba Fujino,Manchester City,WSL_0240
+Sydney Lohmann,Manchester City,WSL_0241
+Iman Beney,Manchester City,WSL_0242
+Yui Hasegawa,Manchester City,WSL_0243
+Rebecca Knaak,Manchester City,WSL_0244
+Gracie Prior,Manchester City,WSL_0245
+Aemu Oyama,Manchester City,WSL_0246
+Ayaka Yamashita,Manchester City,WSL_0247
+Khiara Keating,Manchester City,WSL_0248
+Katie Startup,Manchester City,WSL_0249
+Codie Thomas,Manchester City,WSL_0250
+Lily Murphy,Manchester City,WSL_0251
+Sacha Lewis,Manchester City,WSL_0252
+Eve O'Carroll,Manchester City,WSL_0253
+Mayzee Davies,Manchester City,WSL_0254
+Amelia Oldroyd,Manchester City,WSL_0255
+Freya Hirons,Manchester City,WSL_0256
+Millie Burton,Manchester City,WSL_0257
+Kayla Rendell,Manchester United,WSL_0258
+Anna Sandberg,Manchester United,WSL_0259
+Gabby George,Manchester United,WSL_0260
+Maya Le Tissier,Manchester United,WSL_0261
+Hanna Lundkvist,Manchester United,WSL_0262
+Ella Toone,Manchester United,WSL_0263
+Jess Park,Manchester United,WSL_0264
+Melvine Malard,Manchester United,WSL_0265
+Elisabeth Terland,Manchester United,WSL_0266
+Leah Galton,Manchester United,WSL_0267
+Fridolina Rolfö,Manchester United,WSL_0268
+Simi Awujo,Manchester United,WSL_0269
+Jayde Riviere,Manchester United,WSL_0270
+Celin Bizet Dønnum,Manchester United,WSL_0271
+Lisa Naalsund,Manchester United,WSL_0272
+Dominique Janssen,Manchester United,WSL_0273
+Julia Zigiotti Olme,Manchester United,WSL_0274
+Ellen Wangerheim,Manchester United,WSL_0275
+Hinata Miyazawa,Manchester United,WSL_0276
+Millie Turner,Manchester United,WSL_0277
+Lea Schüller,Manchester United,WSL_0278
+Safia Middleton-Patel,Manchester United,WSL_0279
+Layla Drury,Manchester United,WSL_0280
+Phallon Tullis-Joyce,Manchester United,WSL_0281
+Lize Kop,Tottenham Hotspur,WSL_0282
+Ella Morris,Tottenham Hotspur,WSL_0283
+Molly Bartrip,Tottenham Hotspur,WSL_0284
+Amanda Nildén,Tottenham Hotspur,WSL_0285
+Jessica Naz,Tottenham Hotspur,WSL_0286
+Signe Gaupset,Tottenham Hotspur,WSL_0287
+Maite Oroz,Tottenham Hotspur,WSL_0288
+Olivia Holdt,Tottenham Hotspur,WSL_0289
+Matilda Vinberg,Tottenham Hotspur,WSL_0290
+Matilda Nildén,Tottenham Hotspur,WSL_0291
+Anna Csiki,Tottenham Hotspur,WSL_0292
+Clare Hunt,Tottenham Hotspur,WSL_0293
+Martha Thomas,Tottenham Hotspur,WSL_0294
+Lenna Gunning-Williams,Tottenham Hotspur,WSL_0295
+Cathinka Tandberg,Tottenham Hotspur,WSL_0296
+Olga Ahtinen,Tottenham Hotspur,WSL_0297
+Hanna Wijk,Tottenham Hotspur,WSL_0298
+Drew Spence,Tottenham Hotspur,WSL_0299
+Eveliina Summanen,Tottenham Hotspur,WSL_0300
+Eleanor Heeps,Tottenham Hotspur,WSL_0301
+Araya Dennis,Tottenham Hotspur,WSL_0302
+Tōko Koga,Tottenham Hotspur,WSL_0303
+Julie Blakstad,Tottenham Hotspur,WSL_0304
+Caitlin Dijkstra,Tottenham Hotspur,WSL_0305
+Kirsty Hanson,Tottenham Hotspur,WSL_0306
+Shekiera Martinez,Tottenham Hotspur,WSL_0307
+Victoria Pelova,Tottenham Hotspur,WSL_0308
+Kinga Szemik,West Ham,WSL_0309
+Yu Endo,West Ham,WSL_0310
+Oona Siren,West Ham,WSL_0311
+Tuva Hansen,West Ham,WSL_0312
+Inès Belloumou,West Ham,WSL_0313
+Riko Ueki,West Ham,WSL_0314
+Katie Zelem,West Ham,WSL_0315
+Ria Bose,West Ham,WSL_0316
+Eva Nyström,West Ham,WSL_0317
+Ylinn Tennebø,West Ham,WSL_0318
+Jess Ziu,West Ham,WSL_0319
+Viviane Asseyi,West Ham,WSL_0320
+Sarah Brasero,West Ham,WSL_0321
+Ffion Morgan,West Ham,WSL_0322
+Jessie Stapleton,West Ham,WSL_0323
+Megan Walsh,West Ham,WSL_0324
+Leila Wandeler,West Ham,WSL_0325
+Katie O'Hanlon,West Ham,WSL_0326
+Halle Houssein,West Ham,WSL_0327
+Keira Flannery,West Ham,WSL_0328
+Selin Cemal,West Ham,WSL_0329
+Rebekah Dowsett,West Ham,WSL_0330
+Seraina Piubel,West Ham,WSL_0331
+Constance Picaud,West Ham,WSL_0332
+Nadine Riesen,West Ham,WSL_0333

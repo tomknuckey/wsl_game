@@ -85,6 +85,78 @@ def validate_reference_unique_names(pdf_reference: pd.DataFrame) -> List[str]:
     return errors
 
 
+def validate_reference_sheet(pdf_reference: pd.DataFrame) -> List[str]:
+    """Validate the structure and content of the player reference sheet.
+
+    Args:
+        pdf_reference: Reference DataFrame containing player metadata.
+
+    Returns:
+        A list of error messages for invalid reference sheet contents.
+    """
+    errors: List[str] = []
+    required = {"full_name", "team", "player_id"}
+    missing = required - set(pdf_reference.columns)
+    if missing:
+        errors.append(
+            f"Reference is missing required columns: {', '.join(sorted(missing))}"
+        )
+        return errors
+
+    pdf_reference = pdf_reference.copy()
+    pdf_reference["team"] = pdf_reference["team"].astype(str).str.strip()
+    pdf_reference["full_name"] = pdf_reference["full_name"].astype(str).str.strip()
+    pdf_reference["player_id"] = pdf_reference["player_id"].astype(str).str.strip()
+
+    # Basic structural checks
+    if pdf_reference["full_name"].eq("").any():
+        count = int(pdf_reference["full_name"].eq("").sum())
+        errors.append(f"Reference has {count} blank full_name value(s)")
+    if pdf_reference["team"].eq("").any():
+        count = int(pdf_reference["team"].eq("").sum())
+        errors.append(f"Reference has {count} blank team value(s)")
+    if pdf_reference["player_id"].eq("").any():
+        count = int(pdf_reference["player_id"].eq("").sum())
+        errors.append(f"Reference has {count} blank player_id value(s)")
+
+    # Team count checks
+    team_counts = pdf_reference["team"].value_counts().sort_index()
+    if len(team_counts) != 14:
+        errors.append(
+            f"Reference has {len(team_counts)} teams, expected 14 teams"
+        )
+
+    for team, count in team_counts.items():
+        if count < 11 or count > 50:
+            errors.append(
+                f"Team '{team}' has {count} players; expected between 11 and 50"
+            )
+
+    # ID uniqueness
+    player_id_counts = pdf_reference["player_id"].value_counts()
+    dup_ids = player_id_counts[player_id_counts > 1]
+    for player_id, cnt in dup_ids.items():
+        errors.append(f"Duplicate player_id in reference: '{player_id}' appears {cnt} times")
+
+    # Prohibited content checks
+    string_columns = pdf_reference.select_dtypes(include=["object"]).columns.tolist()
+    prohibited = {"captain", "loan"}
+    for keyword in prohibited:
+        matches = []
+        for idx, row in pdf_reference.iterrows():
+            row_context = f"{row['full_name']} ({row['team']})"
+            for col in string_columns:
+                cell = str(row[col])
+                if keyword in cell.lower():
+                    matches.append(f"{row_context} in column '{col}'")
+        if matches:
+            errors.append(
+                f"Reference contains prohibited text '{keyword}' in rows: {', '.join(matches)}"
+            )
+
+    return errors
+
+
 def validate_players_exist_in_reference(
     pdf_long: pd.DataFrame, pdf_reference: pd.DataFrame
 ) -> List[str]:
@@ -176,6 +248,7 @@ def run_validations(
         A tuple containing deduplicated ``errors`` and ``warnings`` lists.
     """
     errors, warnings = validate_form_responses(pdf_long)
+    errors += validate_reference_sheet(pdf_reference)
     errors += validate_reference_unique_names(pdf_reference)
     errors += validate_players_exist_in_reference(pdf_long, pdf_reference)
     pdf_prep_local = pdf_long.merge(pdf_reference, how="left", on="full_name")
