@@ -13,6 +13,94 @@ def _safe_str(val: Any, default: str = "") -> str:
     return str(val).strip()
 
 
+def _coerce_datetime(value: Any) -> pd.Timestamp:
+    """Parse a timestamp-like value into a pandas Timestamp."""
+    if pd.isna(value):
+        return pd.NaT
+    if isinstance(value, pd.Timestamp):
+        return value
+    if hasattr(value, "to_pydatetime"):
+        try:
+            return pd.Timestamp(value.to_pydatetime())
+        except (TypeError, ValueError):
+            pass
+
+    for fmt in (
+        "%d/%m/%Y %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M",
+    ):
+        try:
+            return pd.to_datetime(value, format=fmt, dayfirst=True)
+        except (TypeError, ValueError):
+            continue
+
+    try:
+        return pd.to_datetime(value, dayfirst=True, errors="coerce")
+    except (TypeError, ValueError):
+        return pd.NaT
+
+
+def filter_form_by_deadline(pdf: pd.DataFrame, deadline: Any) -> pd.DataFrame:
+    """Keep only the latest valid submission per submitter before the deadline."""
+    df = pdf.copy()
+
+    if "timestamp" not in df.columns:
+        logging.info("No timestamp column found; skipping deadline filter")
+        return df
+
+    if df.empty:
+        return df
+
+    deadline_dt = _coerce_datetime(deadline)
+    if pd.isna(deadline_dt):
+        logging.warning("Could not parse submission deadline: %s", deadline)
+        return df
+
+    df["timestamp_parsed"] = df["timestamp"].apply(_coerce_datetime)
+    df["before_deadline"] = df["timestamp_parsed"].isna() | (
+        df["timestamp_parsed"] <= deadline_dt
+    )
+
+    if "name" not in df.columns:
+        filtered_df = df.loc[df["before_deadline"]].drop(
+            columns=["timestamp_parsed", "before_deadline"]
+        )
+        return filtered_df
+
+    eligible_rows = df.loc[df["before_deadline"]].copy()
+    if eligible_rows.empty:
+        passed_count = 0
+        failed_count = int(len(df))
+        logging.info(
+            "Deadline filter summary: %s kept before deadline, %s excluded after deadline",
+            passed_count,
+            failed_count,
+        )
+        return eligible_rows.drop(columns=["timestamp_parsed", "before_deadline"])
+
+    latest_timestamp_by_submitter = eligible_rows.groupby("name")[
+        "timestamp_parsed"
+    ].transform("max")
+    latest_submission_mask = eligible_rows["timestamp_parsed"].eq(
+        latest_timestamp_by_submitter
+    )
+    filtered_df = eligible_rows.loc[latest_submission_mask].drop(
+        columns=["timestamp_parsed", "before_deadline"]
+    )
+
+    passed_count = int(len(filtered_df))
+    failed_count = int(len(df) - passed_count)
+    logging.info(
+        "Deadline filter summary: %s kept before deadline, %s excluded because a later duplicate submission was used",
+        passed_count,
+        failed_count,
+    )
+
+    return filtered_df
+
+
 def rename_form_columns(pdf: pd.DataFrame) -> pd.DataFrame:
     """Rename form response columns to standard names.
 

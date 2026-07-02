@@ -1,6 +1,9 @@
 # Data source directory name
 data_source: str = "test"
 
+# Entries submitted after this deadline are excluded from the results
+submission_deadline: str = "02/09/2026 20:00:00"
+
 manual_renaming_flag: bool = True
 
 #If True, fill invalid picks with random players from the list below

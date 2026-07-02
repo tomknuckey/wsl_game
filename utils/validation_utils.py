@@ -14,7 +14,8 @@ def validate_form_responses(pdf_long: pd.DataFrame) -> Tuple[List[str], List[str
         A tuple with ``errors`` and ``warnings`` lists.
 
     Errors are appended for missing pick counts and duplicate player picks
-    within the same submitter. Warnings are emitted for duplicate team names.
+    within the same submitter. Warnings are emitted for duplicate submissions
+    and duplicate team names across submitters.
     """
     errors: List[str] = []
     warnings: List[str] = []
@@ -40,7 +41,13 @@ def validate_form_responses(pdf_long: pd.DataFrame) -> Tuple[List[str], List[str
         if dupes:
             errors.append(f"{submitter} duplicate picks: {', '.join(dupes)}")
 
-    # Duplicate team names (warning) - only warn if different submitters share a team name
+        submission_count = df[["name", "timestamp"]].drop_duplicates().shape[0]
+        if submission_count > 1:
+            warnings.append(
+                f"{submitter} has multiple submitter entries; using the latest entry before the deadline"
+            )
+
+    # Duplicate team names - warn but do not fail the pipeline
     if "team_name" in pdf_long.columns:
         submitter_teams = (
             pdf_long.groupby("name")["team_name"]
@@ -50,7 +57,6 @@ def validate_form_responses(pdf_long: pd.DataFrame) -> Tuple[List[str], List[str
         submitter_teams["team_name_clean"] = submitter_teams["team_name"].apply(
             lambda v: _safe_str(v, "")
         )
-        # Only check non-empty team names for duplicates
         non_empty_teams = submitter_teams[
             submitter_teams["team_name_clean"] != ""
         ]["team_name_clean"]

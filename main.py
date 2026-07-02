@@ -2,6 +2,7 @@ import pandas as pd
 import random
 from config import (
     data_source,
+    submission_deadline,
     manual_renaming_flag,
     player_fill_flag,
     players_to_fill_with,
@@ -12,6 +13,7 @@ from utils.general_utils import (
     rename_form_columns,
     form_to_long,
     clean_form_data,
+    filter_form_by_deadline,
     number_of_pics,
     adjust_goals,
     generate_results,
@@ -30,12 +32,23 @@ random.seed(42)
 logging.info("Started Running")
 
 # Load form, rename columns, convert to long and clean
+pdf_form_raw = pd.read_csv(f"data/input/{data_source}/form_response.csv")
 pdf_form = (
-    pd.read_csv(f"data/input/{data_source}/form_response.csv")
-    .pipe(rename_form_columns)
+    pdf_form_raw.pipe(rename_form_columns)
     .pipe(form_to_long)
     .pipe(clean_form_data)
 )
+
+pdf_form_before_deadline = pdf_form.pipe(
+    filter_form_by_deadline, submission_deadline
+)
+
+if len(pdf_form_before_deadline) == 0:
+    raise RuntimeError(
+        "No form entries remained after applying the submission deadline."
+    )
+
+pdf_form = pdf_form_before_deadline
 
 # Apply manual renames if enabled
 if manual_renaming_flag:
@@ -55,16 +68,14 @@ if player_fill_flag:
 
 errors, warnings = run_validations(pdf_form, pdf_reference)
 
-# Log and raise if any issues
+# Log warnings and raise only for actual errors
 for w in warnings:
     logging.warning(w)
 for e in errors:
     logging.error(e)
 
-if errors or warnings:
-    all_msgs = []
-    all_msgs += [f"WARNING: {w}" for w in warnings]
-    all_msgs += [f"ERROR: {e}" for e in errors]
+if errors:
+    all_msgs = [f"ERROR: {e}" for e in errors]
     raise AssertionError("Validation failures:\n" + "\n".join(all_msgs))
 
 # Prepare merged dataset for downstream processing
