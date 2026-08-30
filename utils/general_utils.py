@@ -13,6 +13,36 @@ def _safe_str(val: Any, default: str = "") -> str:
     return str(val).strip()
 
 
+def load_reference_sheet(file_path: str) -> pd.DataFrame:
+    """Load the player reference sheet with automatic delimiter detection.
+
+    Some project files are TSV while others are CSV. The loader tries the
+    common delimiters and accepts the first DataFrame that contains the
+    expected reference columns.
+    """
+    candidates = [None, "\t", ",", ";", "|"]
+    last_error = None
+
+    for sep in candidates:
+        try:
+            df = pd.read_csv(file_path, sep=sep, engine="python")
+        except Exception as exc:  # pragma: no cover - fallback path only
+            last_error = exc
+            continue
+
+        normalized_columns = {str(col).strip() for col in df.columns}
+        if {"full_name", "team", "player_id"}.issubset(normalized_columns):
+            return df
+
+        if "full_name" in normalized_columns or "player_id" in normalized_columns:
+            return df
+
+    raise ValueError(
+        f"Could not load reference sheet '{file_path}' with a valid delimiter. "
+        f"Last error: {last_error}"
+    )
+
+
 def _coerce_datetime(value: Any) -> pd.Timestamp:
     """Parse a timestamp-like value into a pandas Timestamp."""
     if pd.isna(value):
@@ -99,6 +129,40 @@ def filter_form_by_deadline(pdf: pd.DataFrame, deadline: Any) -> pd.DataFrame:
     )
 
     return filtered_df
+
+
+def filter_by_name_prefixes(
+    pdf: pd.DataFrame, prefixes: list, enabled: bool = True
+) -> pd.DataFrame:
+    """Exclude rows where the submitter name starts with any prefix in ``prefixes``.
+
+    Operates on the long-form DataFrame (one pick per row). Logs how many rows
+    were dropped and returns the filtered DataFrame.
+    """
+    df = pdf.copy()
+
+    if not enabled or not prefixes:
+        return df
+
+    if "name" not in df.columns:
+        logging.info("No name column found; skipping prefix-based exclusion")
+        return df
+
+    prefixes_norm = [str(p).strip().lower() for p in prefixes if p]
+    if not prefixes_norm:
+        return df
+
+    name_series = df["name"].astype(str).str.strip().str.lower()
+    mask = name_series.apply(lambda n: any(n.startswith(pref) for pref in prefixes_norm))
+    removed_count = int(mask.sum())
+    if removed_count:
+        logging.info(
+            "Excluded %s rows where submitter name started with prefixes: %s",
+            removed_count,
+            prefixes,
+        )
+
+    return df.loc[~mask]
 
 
 def rename_form_columns(pdf: pd.DataFrame) -> pd.DataFrame:

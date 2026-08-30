@@ -3,6 +3,8 @@ import random
 from config import (
     data_source,
     submission_deadline,
+    exclude_name_prefixes_flag,
+    exclude_name_prefixes,
     manual_renaming_flag,
     player_fill_flag,
     players_to_fill_with,
@@ -13,6 +15,7 @@ from utils.general_utils import (
     rename_form_columns,
     form_to_long,
     clean_form_data,
+    filter_by_name_prefixes,
     filter_form_by_deadline,
     number_of_pics,
     adjust_goals,
@@ -20,11 +23,14 @@ from utils.general_utils import (
     apply_manual_renames,
     fill_missing_players,
     resolve_duplicates_in_picks,
+    load_reference_sheet,
 )
 from utils.validation_utils import run_validations
 from manual_updates import MANUAL_RENAMES
 
 import logging
+import sys
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 random.seed(42)
@@ -39,14 +45,19 @@ pdf_form = (
     .pipe(clean_form_data)
 )
 
+# Optionally exclude submitters by name prefix (e.g. TEMP)
+if exclude_name_prefixes_flag:
+    pdf_form = pdf_form.pipe(filter_by_name_prefixes, exclude_name_prefixes, exclude_name_prefixes_flag)
+
 pdf_form_before_deadline = pdf_form.pipe(
     filter_form_by_deadline, submission_deadline
 )
 
 if len(pdf_form_before_deadline) == 0:
-    raise RuntimeError(
-        "No form entries remained after applying the submission deadline."
+    logging.info(
+        "No form entries remained after applying prefix exclusion and/or the submission deadline; exiting."
     )
+    sys.exit(0)
 
 pdf_form = pdf_form_before_deadline
 
@@ -55,7 +66,7 @@ if manual_renaming_flag:
     pdf_form = pdf_form.pipe(apply_manual_renames, MANUAL_RENAMES)
 
 # Load reference
-pdf_reference = pd.read_csv(f"data/input/{data_source}/player_reference.csv")
+pdf_reference = load_reference_sheet(f"data/input/{data_source}/player_reference.csv")
 
 # Fill invalid picks with random players if enabled
 if player_fill_flag:
@@ -93,5 +104,7 @@ pdf_combined = (
 
 pdf_results = generate_results(pdf_combined)
 
-pdf_results.to_csv(f"data/output/{data_source}/results.csv", index=False)
+output_dir = Path(f"data/output/{data_source}")
+output_dir.mkdir(parents=True, exist_ok=True)
+pdf_results.to_csv(output_dir / "results.csv", index=False)
 logging.info("Results saved to CSV")

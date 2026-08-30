@@ -13,6 +13,7 @@
 * Add checks on reference sheet, e.g no duplicates no captains, no country, no on loan from
 * Filter out any outputs after the deadline 
 * Test it breaks for duplicate team names / player names
+* Allow functionality to filter out TEMP_ in the actual game
 
 ### TODO
 **Improve Form** 
@@ -28,10 +29,11 @@
 
 
 * Communication strategy - one whatsapp group?
-* Allow functionality to filter out TEMP_ in the actual game
 
 * Update player reference sheet with new transfers 
 * Test player reference sheet with other users inserting things
 * Add good way of making updates to reference sheet 
 
 * Add test that it meets the expected results
+* Create list of phone numbers for whatsapp chat
+* Add manual exclusion of records, e.g testing ones that aren't TEMP_
