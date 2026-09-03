@@ -255,17 +255,17 @@ def number_of_pics(pdf: pd.DataFrame) -> pd.DataFrame:
 
 
 def adjust_goals(pdf: pd.DataFrame) -> pd.DataFrame:
-    """Adjust goals by normalizing by number of picks.
+    """Adjust goals by splitting each goal across all players who picked them.
 
     Args:
         pdf: DataFrame with goals and num_picks columns
 
     Returns:
-        DataFrame with adjusted goals column
+        DataFrame with normalized goals in the ``goals`` column
     """
     pdf["goals"] = pdf["goals"].fillna(0)
 
-    pdf["adjusted_goals "] = pdf["goals"] / pdf["num_picks"]
+    pdf["goals"] = pdf["goals"] / pdf["num_picks"]
 
     return pdf
 
@@ -282,6 +282,7 @@ def generate_results(pdf: pd.DataFrame) -> pd.DataFrame:
     return (
         pdf.groupby("name")["goals"]
         .sum()
+        .round(2)
         .reset_index()
         .sort_values(by="goals", ascending=False)
     )

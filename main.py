@@ -99,7 +99,10 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 pdf_pics.reset_index().sort_values("num_picks", ascending=False).to_csv(output_dir / "player_pics.csv", index=False)
 
-pdf_goals_agg = generate_goals(max_gw, data_source)
+pdf_goals_agg = generate_goals(max_gw, data_source).merge(
+    pdf_reference[["player_id", "full_name"]], how="left", on="player_id"
+)
+pdf_goals_agg.sort_values("goals", ascending=False).to_csv(output_dir / "pdf_goals_agg.csv", index=False)
 
 pdf_combined = (
     pdf_prep.merge(pdf_goals_agg, how="left", on="player_id")
