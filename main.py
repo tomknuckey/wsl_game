@@ -94,6 +94,11 @@ pdf_prep = pdf_reference.merge(pdf_form, how="inner", on="full_name")
 
 pdf_pics = number_of_pics(pdf_prep)
 
+output_dir = Path(f"data/output/{data_source}")
+output_dir.mkdir(parents=True, exist_ok=True)
+
+pdf_pics.reset_index().sort_values("num_picks", ascending=False).to_csv(output_dir / "player_pics.csv", index=False)
+
 pdf_goals_agg = generate_goals(max_gw, data_source)
 
 pdf_combined = (
@@ -104,7 +109,5 @@ pdf_combined = (
 
 pdf_results = generate_results(pdf_combined)
 
-output_dir = Path(f"data/output/{data_source}")
-output_dir.mkdir(parents=True, exist_ok=True)
 pdf_results.to_csv(output_dir / "results.csv", index=False)
 logging.info("Results saved to CSV")

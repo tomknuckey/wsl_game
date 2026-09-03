@@ -248,10 +248,9 @@ def number_of_pics(pdf: pd.DataFrame) -> pd.DataFrame:
         DataFrame with player_id and num_picks columns
     """
     return (
-        pdf.groupby("player_id")[["name"]]
+        pdf.groupby(["player_id", "full_name"])["team_name"]
         .count()
-        .reset_index()
-        .rename(columns={"name": "num_picks"})
+        .reset_index(name="num_picks")
     )
 
 

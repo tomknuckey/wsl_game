@@ -2,7 +2,7 @@
 #data_source: str = "test"
 data_source = "actual"
 # Entries submitted after this deadline are excluded from the results
-submission_deadline: str = "02/09/2026 20:00:00"
+submission_deadline: str = "03/09/2026 20:00:00"
 
 # If True, exclude submitters whose name starts with any of these prefixes
 exclude_name_prefixes_flag: bool = True
