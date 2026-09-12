@@ -11,7 +11,10 @@ from config import (
     max_gw,
 )
 from utils.general_utils import (
+    generate_best_differential,
     generate_goals,
+    generate_manager_ownership,
+    generate_top_missed,
     rename_form_columns,
     form_to_long,
     clean_form_data,
@@ -98,19 +101,22 @@ output_dir = Path(f"data/output/{data_source}")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 pdf_pics.reset_index().sort_values("num_picks", ascending=False).to_csv(output_dir / "player_pics.csv", index=False)
+generate_manager_ownership(pdf_prep, pdf_pics, output_dir)
 
 pdf_goals_agg = generate_goals(max_gw, data_source).merge(
     pdf_reference[["player_id", "full_name"]], how="left", on="player_id"
 )
 pdf_goals_agg.sort_values("goals", ascending=False).to_csv(output_dir / "pdf_goals_agg.csv", index=False)
 
-pdf_combined = (
+generate_top_missed(pdf_goals_agg, pdf_pics)
+generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep)
+
+pdf_results= (
     pdf_prep.merge(pdf_goals_agg, how="left", on="player_id")
     .merge(pdf_pics, how="left", on="player_id")
     .pipe(adjust_goals)
+    .pipe(generate_results)
 )
-
-pdf_results = generate_results(pdf_combined)
 
 pdf_results.to_csv(output_dir / "results.csv", index=False)
 logging.info("Results saved to CSV")

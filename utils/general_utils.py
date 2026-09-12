@@ -30,6 +30,14 @@ def load_reference_sheet(file_path: str) -> pd.DataFrame:
             last_error = exc
             continue
 
+        df = df.copy()
+        df.columns = [str(col).strip() for col in df.columns]
+
+        if "player_id" in df.columns:
+            df["player_id"] = df["player_id"].astype(str).str.strip()
+        if "full_name" in df.columns:
+            df["full_name"] = df["full_name"].astype(str).str.strip()
+
         normalized_columns = {str(col).strip() for col in df.columns}
         if {"full_name", "team", "player_id"}.issubset(normalized_columns):
             return df
@@ -505,14 +513,61 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
 
     for gw in range(1, max_gw):
         file_path = f"data/input/{data_source}/player_goals/GW_{gw}.csv"
-        
+
         try:
             pdf_temp = pd.read_csv(file_path)
-            pdf_temp["gw"] = gw 
+            if "player_id" in pdf_temp.columns:
+                pdf_temp["player_id"] = pdf_temp["player_id"].astype(str).str.strip()
+            if "goals" in pdf_temp.columns:
+                pdf_temp["goals"] = pd.to_numeric(pdf_temp["goals"], errors="coerce").fillna(0)
+            pdf_temp["gw"] = gw
             pdf_goals.append(pdf_temp)
         except FileNotFoundError:
             pass  # skips missing GW files
 
+    if not pdf_goals:
+        return pd.DataFrame(columns=["player_id", "goals"])
+
     pdf_goals = pd.concat(pdf_goals, ignore_index=True)
 
     return pdf_goals.groupby("player_id").agg({"goals": "sum"}).reset_index()
+
+
+def generate_top_missed(pdf_goals_agg, pdf_pics):
+
+    """ Generate a report of the top 20 players with goals scored but not picked by any manager."""
+
+    pdf_goals_pics =pdf_goals_agg.merge(pdf_pics[["player_id", "num_picks"]], how="left", on="player_id")
+    pdf_goals_pics["num_picks"] = pdf_goals_pics["num_picks"].fillna(0)
+    pdf_goals_pics = pdf_goals_pics.query("num_picks == 0").sort_values("goals", ascending=False).head(20)
+    print("Top Missed")
+    print(pdf_goals_pics.head())
+
+def generate_manager_ownership(pdf_prep, pdf_pics, output_dir):
+
+    """Generate a report of the average ownership per manager and the number of template/differential picks.
+    """
+
+    manager_ownership = (
+        pdf_prep.merge(pdf_pics, how="left", on="player_id")
+        .groupby(["name", "team_name"])
+        .agg(
+            avg_ownership=("num_picks", "mean"),
+            template_picks=("num_picks", lambda picks: (picks >= 2).sum()),
+            differential_picks=("num_picks", lambda picks: (picks == 1).sum()),
+        )
+        .reset_index()
+        .assign(avg_ownership=lambda df: df["avg_ownership"].round(2))
+        .sort_values(["avg_ownership", "differential_picks"], ascending=[False, True])
+    )
+    manager_ownership.to_csv(output_dir / "manager_ownership.csv", index=False)
+
+def generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep):
+
+    """Generate a report of the best differential picks (players picked by only one manager with goals scored).
+    """
+
+    pdf_differential = pdf_pics.merge(pdf_goals_agg[["player_id", "goals"]], how="left", on="player_id").sort_values("num_picks", ascending=False).query("num_picks == 1").query("goals > 0").merge(pdf_prep[["player_id", "name", "team_name"]], on="player_id")
+    pdf_differential["goals"] = pdf_differential["goals"].fillna(0).astype(int)
+    print("Best Differential Picks")
+    print(pdf_differential.sort_values("goals", ascending=False).head())
