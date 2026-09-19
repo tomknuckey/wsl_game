@@ -14,9 +14,8 @@ git push origin v0.4.0
 | **MINOR** — new functionality                  | `1.1.0` | Add player leaderboard              |
 | **MAJOR** — significant change/breaking change | `2.0.0` | Completely change how scoring works |
 
-Version log like this?
 
-# Changelog
+# Changelog Example
 
 All notable changes to the WSL Game are documented here.
 
