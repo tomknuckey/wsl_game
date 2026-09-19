@@ -3,3 +3,4 @@ numpy
 plotly
 pylint
 black
+streamlit
