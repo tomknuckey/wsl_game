@@ -246,7 +246,7 @@ def clean_form_data(pdf: pd.DataFrame) -> pd.DataFrame:
     return pdf
 
 
-def number_of_pics(pdf: pd.DataFrame) -> pd.DataFrame:
+def number_of_pics(pdf: pd.DataFrame, output_dir) -> pd.DataFrame:
     """Count the number of picks per player.
 
     Args:
@@ -255,12 +255,11 @@ def number_of_pics(pdf: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame with player_id and num_picks columns
     """
-    return (
-        pdf.groupby(["player_id", "full_name"])["team_name"]
-        .count()
-        .reset_index(name="num_picks")
-    )
+    
+    pdf_pics = pdf.groupby(["player_id", "full_name"])["team_name"].count().reset_index(name="num_picks")
 
+    pdf_pics.reset_index().sort_values("num_picks", ascending=False).to_csv(output_dir / "player_pics.csv", index=False)
+    return pdf_pics
 
 def adjust_goals(pdf: pd.DataFrame) -> pd.DataFrame:
     """Adjust goals by splitting each goal across all players who picked them.
@@ -278,7 +277,7 @@ def adjust_goals(pdf: pd.DataFrame) -> pd.DataFrame:
     return pdf
 
 
-def generate_results(pdf: pd.DataFrame) -> pd.DataFrame:
+def generate_results(pdf: pd.DataFrame, output_dir) -> pd.DataFrame:
     """Generate summary results grouped by name and sorted by goals.
 
     Args:
@@ -287,14 +286,10 @@ def generate_results(pdf: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame with total goals per person, sorted descending
     """
-    return (
-        pdf.groupby("name")["goals"]
-        .sum()
-        .round(2)
-        .reset_index()
-        .sort_values(by="goals", ascending=False)
-    )
 
+    pdf_output = pdf.groupby("name")["goals"].sum().round(2).reset_index().sort_values(by="goals", ascending=False)
+    pdf_output.to_csv(output_dir / "results.csv", index=False)
+    return pdf_output
 
 def apply_manual_renames(pdf_long: pd.DataFrame, renames: dict) -> pd.DataFrame:
     """Apply manual renames to the `full_name` column in a long-form dataframe.
@@ -533,15 +528,14 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
     return pdf_goals.groupby("player_id").agg({"goals": "sum"}).reset_index()
 
 
-def generate_top_missed(pdf_goals_agg, pdf_pics):
+def generate_top_missed(pdf_goals_agg, pdf_pics, output_dir):
 
     """ Generate a report of the top 20 players with goals scored but not picked by any manager."""
 
     pdf_goals_pics =pdf_goals_agg.merge(pdf_pics[["player_id", "num_picks"]], how="left", on="player_id")
     pdf_goals_pics["num_picks"] = pdf_goals_pics["num_picks"].fillna(0)
     pdf_goals_pics = pdf_goals_pics.query("num_picks == 0").sort_values("goals", ascending=False).head(20)
-    print("Top Missed")
-    print(pdf_goals_pics.head())
+    pdf_goals_pics.to_csv(output_dir / "top_missed.csv", index=False)
 
 def generate_manager_ownership(pdf_prep, pdf_pics, output_dir):
 
@@ -562,12 +556,11 @@ def generate_manager_ownership(pdf_prep, pdf_pics, output_dir):
     )
     manager_ownership.to_csv(output_dir / "manager_ownership.csv", index=False)
 
-def generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep):
+def generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep, output_dir):
 
     """Generate a report of the best differential picks (players picked by only one manager with goals scored).
     """
 
     pdf_differential = pdf_pics.merge(pdf_goals_agg[["player_id", "goals"]], how="left", on="player_id").sort_values("num_picks", ascending=False).query("num_picks == 1").query("goals > 0").merge(pdf_prep[["player_id", "name", "team_name"]], on="player_id")
     pdf_differential["goals"] = pdf_differential["goals"].fillna(0).astype(int)
-    print("Best Differential Picks")
-    print(pdf_differential.sort_values("goals", ascending=False).head())
+    pdf_differential.sort_values("goals", ascending=False).to_csv(output_dir / "best_differential.csv", index=False)
