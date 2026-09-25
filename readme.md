@@ -1,3 +1,5 @@
+https://wslgame.streamlit.app/
+
 ## Setting up Env
 
 1. python -m venv venv
