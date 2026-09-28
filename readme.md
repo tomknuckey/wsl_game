@@ -1,3 +1,7 @@
+### App Website
+
+https://wslgame.streamlit.app/
+
 ## Setting up Env
 
 1. python -m venv venv
@@ -5,3 +9,7 @@
 2. .\venv\Scripts\Activate.ps1
 
 3. pip install -r requirements.txt
+
+### Running App Locally
+
+streamlit run app.py
