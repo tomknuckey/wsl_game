@@ -1,6 +1,8 @@
 import logging
-import pandas as pd
+from pathlib import Path
 from typing import Any
+
+import pandas as pd
 
 
 def _safe_str(val: Any, default: str = "") -> str:
@@ -495,7 +497,9 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
     """Load and aggregate goal data across multiple gameweeks.
 
     Reads goal CSVs from ``data/input/{data_source}/player_goals/GW_*.csv``
-    for gameweeks 1 through ``max_gw``. Missing files are skipped silently.
+    for gameweeks 1 through ``max_gw`` (exclusive). The gameweek is read from
+    each filename; blank or omitted goal counts default to one. Missing files
+    are skipped silently.
 
     Args:
         max_gw: Maximum gameweek number to attempt to load (exclusive).
@@ -505,20 +509,26 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
         DataFrame with columns ``player_id`` and ``goals`` (aggregated across all GWs).
     """
     pdf_goals = []
+    goals_dir = Path("data") / "input" / data_source / "player_goals"
 
-    for gw in range(1, max_gw):
-        file_path = f"data/input/{data_source}/player_goals/GW_{gw}.csv"
-
+    for file_path in sorted(goals_dir.glob("GW_*.csv")):
         try:
-            pdf_temp = pd.read_csv(file_path)
-            if "player_id" in pdf_temp.columns:
-                pdf_temp["player_id"] = pdf_temp["player_id"].astype(str).str.strip()
-            if "goals" in pdf_temp.columns:
-                pdf_temp["goals"] = pd.to_numeric(pdf_temp["goals"], errors="coerce").fillna(0)
-            pdf_temp["gw"] = gw
-            pdf_goals.append(pdf_temp)
-        except FileNotFoundError:
-            pass  # skips missing GW files
+            gw = int(file_path.stem.partition("_")[2])
+        except ValueError:
+            continue
+        if not 1 <= gw < max_gw:
+            continue
+
+        pdf_temp = pd.read_csv(file_path)
+        if "player_id" in pdf_temp.columns:
+            pdf_temp["player_id"] = pdf_temp["player_id"].astype(str).str.strip()
+        if "goals" not in pdf_temp.columns:
+            pdf_temp["goals"] = 1
+        else:
+            pdf_temp["goals"] = pdf_temp["goals"].replace(r"^\s*$", pd.NA, regex=True).fillna(1)
+            pdf_temp["goals"] = pd.to_numeric(pdf_temp["goals"], errors="coerce").fillna(0).astype(int)
+        pdf_temp["gw"] = gw
+        pdf_goals.append(pdf_temp)
 
     if not pdf_goals:
         return pd.DataFrame(columns=["player_id", "goals"])
