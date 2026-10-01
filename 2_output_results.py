@@ -37,7 +37,7 @@ pdf_pics = number_of_pics(pdf_prep, output_dir)
 generate_manager_ownership(pdf_prep, pdf_pics, output_dir)
 
 pdf_goals_agg = generate_goals(max_gw, data_source).merge(
-    pdf_reference[["player_id", "full_name"]], how="left", on="player_id"
+    pdf_reference[["player_id", "full_name", "team"]], how="left", on="player_id"
 )
 pdf_goals_agg.sort_values("goals", ascending=False).to_csv(output_dir / "pdf_goals_agg.csv", index=False)
 
