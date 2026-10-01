@@ -258,11 +258,7 @@ def number_of_pics(pdf: pd.DataFrame, output_dir) -> pd.DataFrame:
         DataFrame with player_id and num_picks columns
     """
     
-    pdf_pics = (
-        pdf.groupby(["player_id", "full_name", "team"])["team_name"]
-        .count()
-        .reset_index(name="num_picks")
-    )
+    pdf_pics = pdf.groupby(["player_id", "full_name"])["team_name"].count().reset_index(name="num_picks")
 
     pdf_pics.reset_index().sort_values("num_picks", ascending=False).to_csv(output_dir / "player_pics.csv", index=False)
     return pdf_pics
@@ -293,13 +289,7 @@ def generate_results(pdf: pd.DataFrame, output_dir) -> pd.DataFrame:
         DataFrame with total goals per person, sorted descending
     """
 
-    pdf_output = (
-        pdf.groupby(["name", "team_name"], dropna=False)["goals"]
-        .sum()
-        .round(2)
-        .reset_index()
-        .sort_values(by="goals", ascending=False)
-    )
+    pdf_output = pdf.groupby("name")["goals"].sum().round(2).reset_index().sort_values(by="goals", ascending=False)
     pdf_output.to_csv(output_dir / "results.csv", index=False)
     return pdf_output
 
