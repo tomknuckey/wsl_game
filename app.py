@@ -60,21 +60,21 @@ pdf_top_missed = load_csv("data/output/actual/top_missed.csv")
 # Human-readable display names for tables
 pdf_results = humanise_columns(
     pdf_results,
-    {"name": "Manager", "goals": "Goals"},
+    {"name": "Manager", "team_name": "Team Name", "goals": "Goals"},
 ).sort_values("Goals", ascending=False).reset_index(drop=True)
 pdf_results.insert(0, "Position", range(1, len(pdf_results) + 1))
-pdf_results = pdf_results[["Position", "Manager", "Goals"]]
+pdf_results = pdf_results[["Position", "Manager", "Team Name", "Goals"]]
 
 pdf_goals_agg = humanise_columns(
     pdf_goals_agg,
-    {"player_id": "Player ID", "full_name": "Player", "goals": "Goals"},
-)[["Player", "Goals"]]
+    {"player_id": "Player ID", "full_name": "Player", "team": "Club", "goals": "Goals"},
+)[["Player", "Club", "Goals"]]
 
 pdf_manager_ownership = humanise_columns(
     pdf_manager_ownership,
     {
         "name": "Manager",
-        "team_name": "Team",
+        "team_name": "Team Name",
         "avg_ownership": "Average Player Ownership",
         "template_picks": "Non Unique Picks",
         "differential_picks": "Unique Picks",
@@ -83,23 +83,24 @@ pdf_manager_ownership = humanise_columns(
 
 pdf_pics = humanise_columns(
     pdf_pics,
-    {"index": "Rank", "player_id": "Player ID", "full_name": "Player", "num_picks": "Picks"},
-)[["Player", "Picks"]]
+    {"index": "Rank", "player_id": "Player ID", "full_name": "Player", "team": "Club", "num_picks": "Picks"},
+)[["Player", "Club", "Picks"]]
 
 pdf_best_differential = humanise_columns(
     pdf_best_differential,
     {
         "full_name": "Player",
+        "team": "Club",
         "goals": "Goals",
         "name": "Manager",
-        "team_name": "Team",
+        "team_name": "Team Name",
     },
-)[["Player", "Goals", "Manager", "Team"]]
+    )[["Player", "Club", "Goals", "Manager", "Team Name"]]
 
 pdf_top_missed = humanise_columns(
     pdf_top_missed,
-    {"full_name": "Player", "goals": "Goals"},
-)[["Player", "Goals"]]
+    {"full_name": "Player", "team": "Club", "goals": "Goals"},
+)[["Player", "Club", "Goals"]]
 
 
 # Custom styling
