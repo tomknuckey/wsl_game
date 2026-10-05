@@ -2,11 +2,11 @@
 
 ## Current Project Shape
 
-The project currently has a batch data pipeline and a read-only Streamlit app:
+The project currently has a batch data pipeline, a public Overall Results page, and a separate Team Pics page gated by team name and a unique four-digit access code:
 
 1. `1_prepare_forms.py` cleans form responses and writes long-form player picks.
 2. `2_output_results.py` joins picks to player reference data and gameweek goals, then writes aggregate CSV reports.
-3. `app.py` reads those reports and displays results. It does not currently authenticate users or write data.
+3. The Overall Results page displays public reports. The Team Pics page shows a team's picks, allows one saved one-player-out/one-player-in transfer per team, and records it in `data/team_transfers.csv`. The updated roster appears on Team Pics; scoring reports are not recalculated from the transfer yet.
 
 Player reference data has stable `player_id` values, but submitted picks are initially represented by player names. Managers are identified by submitted name and team name, rather than stable account IDs. Goal inputs are stored separately by gameweek, but the scoring helper aggregates goals across weeks before calculating manager results.
 
@@ -26,11 +26,11 @@ For the first stage, acceptance means a participant can enter their code, the ap
 
 With the roster already visible, collect one player to remove and one to add. Use a selectbox for the outgoing player, limited to the current roster. For the incoming player, use Streamlit's searchable selectbox over eligible players, excluding players already on that team. This is easier and less error-prone than free-text names when the player list is large. Store or submit stable `player_id` values, while displaying player names and clubs.
 
-Keep the UI as a preview/confirmation step initially. Validate that the outgoing player belongs to the signed-in user's team and the incoming player is eligible and not already selected. The rule for how many transfers are allowed and when this change applies must come from configuration, not hard-coded widget or scoring logic.
+Validate that the outgoing player belongs to the signed-in team's roster and the incoming player is eligible and not already selected. The current page immediately saves the explicitly submitted one-for-one transfer and allows only one transfer per team.
 
 ### 3. Save The Transfer And Use It In Results
 
-Save the confirmed transfer in persistent storage, tied to the team selected by the access code. Once saved, show the updated roster and transfer status back to the user. Enforce the configured transfer limit and deadline in the save operation; hiding or disabling a control in the UI is not sufficient enforcement.
+Save the submitted transfer in the CSV ledger, tied to the team selected by the access code. Once saved, show the updated roster and transfer status back to the user. The ledger write enforces the one-transfer limit; hiding the form after submission is not the only enforcement.
 
 For a transfer effective from GW10, preserve the roster used in each gameweek: GW1-GW9 use the original picks, and GW10 onward use the roster after the transfer. Goal inputs are already stored by gameweek, but `generate_goals()` currently aggregates them before manager scoring. Change scoring to calculate from gameweek-level goals and the roster active in that week. Ownership and differential reports may also need to use weekly rosters rather than season-wide ownership.
 
@@ -68,13 +68,15 @@ For one transfer, derive each week's roster from the initial picks and the trans
 
 Continue using CSVs for gameweek goal inputs, the player reference during the transition, and generated reports. They are easy to inspect and fit the existing reporting pipeline.
 
-Use a database as the authoritative store for participant-to-team mappings, initial picks, and transfers. Database transactions are a better fit for enforcing transfer limits and preventing conflicting updates than writing shared CSV files. SQLite is suitable for local development and learning. For a deployed multi-user app, use persistent hosted storage, such as a managed PostgreSQL service; do not rely on local app files as durable shared storage.
+The current requested transfer ledger is a CSV at `data/team_transfers.csv`. This is simple and inspectable for local use, and the app prevents a second transfer per team while running as a single process. CSV writes are not transactional across multiple app instances and Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Before relying on transfers in the hosted game, move the ledger to persistent transactional storage such as managed PostgreSQL; do not treat the deployed CSV as durable backup.
 
 There is no need to migrate every existing dataset into the database. A small database-backed transfer workflow can coexist with the CSV reporting pipeline.
 
 ## Authentication And Authorization
 
 The current public app can remain read-only for everyone, with a code required for the transfer workflow. Map each code to a stable participant/team record. The chosen low-friction code is an access convenience, not strong authentication, so participants should understand that sharing or guessing a code may allow access to that team's controls.
+
+The interim Team Pics page uses a distinct four-digit access code for each team alongside a team-name lookup. This is only a basic access barrier: four-digit codes can be guessed or shared, and it does not verify participant identity. The access-code spreadsheet is tracked in Git at the user's request, so anyone with repository access can see the codes. The public results page remains available without sign-in.
 
 Keep database credentials in deployment secrets, not in the repository. Avoid publishing private email or contact details in output reports. To make later scaling straightforward, keep the access-code-to-team lookup and all transfer validation on the server, use stable IDs rather than names in stored records, and avoid storing writable state in local files or Streamlit session state.
 
