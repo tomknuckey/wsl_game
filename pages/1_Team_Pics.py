@@ -8,11 +8,14 @@ from config import season_id, transfer_rules
 from utils.access_code_utils import authenticate_team, load_team_access_codes
 from utils.general_utils import build_weekly_rosters
 from utils.transfer_utils import (
-    TransferRule,
+    filter_transfer_records_for_rules,
+    format_utc_datetime,
     get_active_team_transfer,
     load_transfer_records,
+    normalise_team_name,
     record_correction,
     record_transfer,
+    transfer_rules_from_config,
 )
 
 
@@ -83,23 +86,42 @@ else:
         ),
         default=1,
     )
+    configured_transfer_rules = transfer_rules_from_config(transfer_rules)
+    current_time = datetime.now(timezone.utc)
+    season_transfer_rules = [
+        rule for rule in configured_transfer_rules if rule.season_id == season_id
+    ]
     active_transfer_rule = next(
         (
-            TransferRule(
-                season_id=rule["season_id"],
-                gameweek=int(rule["gameweek"]),
-                deadline_utc=rule["deadline_utc"],
-                max_transfers_per_team=int(rule["max_transfers_per_team"]),
-            )
-            for rule in transfer_rules
-            if rule["season_id"] == season_id
-            and int(rule["gameweek"]) == current_gameweek
+            rule
+            for rule in season_transfer_rules
+            if rule.is_open(current_time)
         ),
         None,
     )
+    if active_transfer_rule is None:
+        upcoming_rules = [
+            rule
+            for rule in season_transfer_rules
+            if not rule.has_started(current_time)
+        ]
+        if upcoming_rules:
+            active_transfer_rule = min(
+                upcoming_rules,
+                key=lambda rule: rule.start_datetime_utc,
+            )
+        elif season_transfer_rules:
+            active_transfer_rule = max(
+                season_transfer_rules,
+                key=lambda rule: rule.deadline_datetime_utc,
+            )
     ledger_valid = True
     try:
         transfer_records = load_transfer_records(TRANSFER_LEDGER_PATH)
+        transfer_records = filter_transfer_records_for_rules(
+            transfer_records,
+            configured_transfer_rules,
+        )
     except ValueError:
         transfer_records = []
         ledger_valid = False
@@ -109,19 +131,31 @@ else:
         picks,
         TRANSFER_LEDGER_PATH,
         max_gameweek=current_gameweek,
+        transfer_rules=configured_transfer_rules,
     )
     current_roster = weekly_rosters.loc[
         (weekly_rosters["team_name"] == selected_team)
         & (weekly_rosters["gameweek"] == current_gameweek),
         ["player_id"],
     ]
+    initial_team_player_ids = team_picks["player_id"].tolist()
     team_picks = team_picks.merge(
         current_roster,
         on="player_id",
         how="inner",
         validate="one_to_one",
     )
-    team_transfer = get_active_team_transfer(transfer_records, selected_team)
+    current_rule_records = (
+        [
+            record
+            for record in transfer_records
+            if active_transfer_rule is not None
+            and record["rule_id"] == active_transfer_rule.rule_id
+        ]
+        if active_transfer_rule is not None
+        else []
+    )
+    team_transfer = get_active_team_transfer(current_rule_records, selected_team)
     transfer_is_active = bool(
         team_transfer
         and int(team_transfer["effective_gameweek"]) <= current_gameweek
@@ -136,6 +170,64 @@ else:
 
     if not roster_valid:
         st.error("This roster has missing or duplicate player IDs. Transfers are blocked.")
+
+    can_make_transfer_now = False
+    current_date = (
+        f"{current_time:%A}, {current_time.day} {current_time:%B %Y}"
+    )
+    st.caption(f"Current date (UTC): {current_date}")
+    if active_transfer_rule is not None:
+        start_display = format_utc_datetime(active_transfer_rule.start_datetime_utc)
+        deadline_display = format_utc_datetime(
+            active_transfer_rule.deadline_datetime_utc
+        )
+        st.caption(
+            f"Transfer window for GW{active_transfer_rule.gameweek}: "
+            f"{start_display} to {deadline_display}."
+        )
+        if not ledger_valid or not roster_valid:
+            st.warning("Transfer status: unavailable; contact the game administrator.")
+        elif not active_transfer_rule.has_started(current_time):
+            st.info(
+                "Transfer status: not open yet. You can make or update your transfer "
+                f"from {start_display}."
+            )
+        elif not active_transfer_rule.is_open(current_time):
+            st.info(
+                f"Transfer status: closed. The deadline was {deadline_display}."
+            )
+        else:
+            rule_transfer_count = sum(
+                1
+                for record in current_rule_records
+                if normalise_team_name(record["team_name"])
+                == normalise_team_name(selected_team)
+                and record["season_id"] == active_transfer_rule.season_id
+                and record["action_type"] == "transfer"
+            )
+            can_submit_or_update = (
+                rule_transfer_count < active_transfer_rule.max_transfers_per_team
+                or team_transfer is not None
+            )
+            can_make_transfer_now = (
+                rule_transfer_count < active_transfer_rule.max_transfers_per_team
+            )
+            if can_submit_or_update:
+                action = "update" if team_transfer is not None else "make"
+                st.success(
+                    f"Transfer status: open. You can {action} your transfer "
+                    f"until {deadline_display}."
+                )
+            else:
+                st.warning(
+                    "Transfer status: unavailable; your transfer allowance has "
+                    "been used."
+                )
+    else:
+        st.info(
+            f"Transfer status: unavailable. No transfer window is configured for "
+            f"{season_id}."
+        )
 
     st.subheader(selected_team)
     if team_picks.empty:
@@ -160,23 +252,44 @@ else:
         )
     elif not ledger_valid:
         pass
-    elif roster_valid and active_transfer_rule is not None:
-        st.subheader("Make a transfer")
+    elif (
+        roster_valid
+        and active_transfer_rule is not None
+        and not active_transfer_rule.has_started(current_time)
+    ):
+        pass
+    if (
+        roster_valid
+        and active_transfer_rule is not None
+        and active_transfer_rule.is_open(current_time)
+        and (can_make_transfer_now or team_transfer is not None)
+    ):
+        st.subheader("Update your transfer" if team_transfer else "Make a transfer")
         st.caption(
             f"{active_transfer_rule.max_transfers_per_team} transfers per team in "
-            f"{active_transfer_rule.season_id}. The transfer gameweek is GW"
-            f"{active_transfer_rule.gameweek}; deadline is "
-            f"{active_transfer_rule.deadline_utc}."
+            f"{active_transfer_rule.season_id} for GW"
+            f"{active_transfer_rule.gameweek}."
         )
-        current_player_ids = current_player_ids.tolist()
+        transfer_selection_roster_ids = list(current_player_ids)
+        if (
+            team_transfer is not None
+            and int(team_transfer["effective_gameweek"]) <= current_gameweek
+            and team_transfer["player_in_id"] in transfer_selection_roster_ids
+        ):
+            transfer_selection_roster_ids[
+                transfer_selection_roster_ids.index(team_transfer["player_in_id"])
+            ] = team_transfer["player_out_id"]
+        elif team_transfer is not None and not transfer_is_active:
+            transfer_selection_roster_ids = initial_team_player_ids
+
         available_players = player_reference[
-            ~player_reference["player_id"].isin(current_player_ids)
+            ~player_reference["player_id"].isin(transfer_selection_roster_ids)
         ].sort_values("full_name")
 
         with st.form("transfer_submission"):
             outgoing_player_id = st.selectbox(
                 "Player to remove",
-                options=current_player_ids,
+                options=transfer_selection_roster_ids,
                 format_func=lambda player_id: (
                     f"{players_by_id[player_id]['full_name']} "
                     f"({players_by_id[player_id]['team']})"
@@ -196,7 +309,9 @@ else:
                 placeholder="Type a name to search",
                 key="team_pics_incoming_player_id",
             )
-            submitted = st.form_submit_button("Save transfer")
+            submitted = st.form_submit_button(
+                "Update transfer" if team_transfer else "Save transfer"
+            )
 
         if submitted:
             if outgoing_player_id is None or incoming_player_id is None:
@@ -204,7 +319,7 @@ else:
             else:
                 submitted_at = datetime.now(timezone.utc)
                 if not active_transfer_rule.is_open(submitted_at):
-                    st.error("The transfer deadline has passed.")
+                    st.error("The transfer window has closed.")
                 else:
                     outgoing_player = player_reference.loc[
                         player_reference["player_id"] == outgoing_player_id
@@ -218,79 +333,37 @@ else:
                         outgoing = outgoing_player.iloc[0]
                         incoming = incoming_player.iloc[0]
                         try:
-                            record_transfer(
-                                TRANSFER_LEDGER_PATH,
-                                team_name=selected_team,
-                                current_player_ids=current_player_ids,
-                                player_out_id=outgoing_player_id,
-                                player_out_name=outgoing["full_name"],
-                                player_in_id=incoming_player_id,
-                                player_in_name=incoming["full_name"],
-                                player_in_club=incoming["team"],
-                                effective_gameweek=active_transfer_rule.gameweek,
-                                rule=active_transfer_rule,
-                            )
+                            if team_transfer is None:
+                                record_transfer(
+                                    TRANSFER_LEDGER_PATH,
+                                    team_name=selected_team,
+                                    current_player_ids=transfer_selection_roster_ids,
+                                    player_out_id=outgoing_player_id,
+                                    player_out_name=outgoing["full_name"],
+                                    player_in_id=incoming_player_id,
+                                    player_in_name=incoming["full_name"],
+                                    player_in_club=incoming["team"],
+                                    effective_gameweek=active_transfer_rule.gameweek,
+                                    rule=active_transfer_rule,
+                                )
+                            else:
+                                record_correction(
+                                    TRANSFER_LEDGER_PATH,
+                                    team_name=selected_team,
+                                    current_player_ids=transfer_selection_roster_ids,
+                                    player_out_id=outgoing_player_id,
+                                    player_out_name=outgoing["full_name"],
+                                    player_in_id=incoming_player_id,
+                                    player_in_name=incoming["full_name"],
+                                    player_in_club=incoming["team"],
+                                    correction_of_transfer_id=team_transfer["transfer_id"],
+                                    correction_reason="Updated by team during transfer window",
+                                    effective_gameweek=active_transfer_rule.gameweek,
+                                    rule=active_transfer_rule,
+                                )
                         except ValueError as error:
                             st.error(str(error))
                         else:
-                            st.rerun()
-
-    if team_transfer and roster_valid and active_transfer_rule is not None:
-        if active_transfer_rule.is_open(datetime.now(timezone.utc)):
-            correction_players = current_player_ids.tolist()
-            correction_available = player_reference[
-                ~player_reference["player_id"].isin(correction_players)
-            ].sort_values("full_name")
-            original_outgoing = team_transfer["player_out_id"]
-            original_outgoing_player = player_reference.loc[
-                player_reference["player_id"] == original_outgoing
-            ]
-            with st.form("transfer_correction"):
-                correction_incoming = st.selectbox(
-                    "Correct the incoming player",
-                    options=correction_available["player_id"].tolist(),
-                    format_func=lambda player_id: (
-                        f"{players_by_id[player_id]['full_name']} "
-                        f"({players_by_id[player_id]['team']})"
-                    ),
-                    index=None,
-                )
-                correction_reason = st.text_input("Reason for correction")
-                correction_submitted = st.form_submit_button("Record correction")
-
-            if correction_submitted:
-                if correction_incoming is None:
-                    st.error("Choose a replacement incoming player.")
-                elif not correction_reason.strip():
-                    st.error("Add a reason for the correction.")
-                else:
-                    correction_incoming_player = player_reference.loc[
-                        player_reference["player_id"] == correction_incoming
-                    ]
-                    if len(original_outgoing_player) != 1 or len(correction_incoming_player) != 1:
-                        st.error("The selected player IDs are not unique in the reference.")
-                    else:
-                        try:
-                            record_correction(
-                                TRANSFER_LEDGER_PATH,
-                                team_name=selected_team,
-                                current_player_ids=correction_players,
-                                player_out_id=original_outgoing,
-                                player_out_name=original_outgoing_player.iloc[0]["full_name"],
-                                player_in_id=correction_incoming,
-                                player_in_name=correction_incoming_player.iloc[0]["full_name"],
-                                player_in_club=correction_incoming_player.iloc[0]["team"],
-                                correction_of_transfer_id=team_transfer["transfer_id"],
-                                correction_reason=correction_reason,
-                                effective_gameweek=active_transfer_rule.gameweek,
-                                rule=active_transfer_rule,
-                            )
-                        except ValueError as error:
-                            st.error(str(error))
-                        else:
-                            st.success(
-                                "Correction recorded. The original transfer remains in the audit ledger."
-                            )
                             st.rerun()
 
     if st.button("Sign out"):

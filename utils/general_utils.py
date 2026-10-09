@@ -1,10 +1,15 @@
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
-from utils.transfer_utils import load_transfer_records
+from utils.transfer_utils import (
+    TransferRule,
+    filter_transfer_records_for_rules,
+    load_transfer_records,
+)
 
 
 def _safe_str(val: Any, default: str = "") -> str:
@@ -555,6 +560,7 @@ def build_weekly_rosters(
     picks: pd.DataFrame,
     transfer_ledger_path: str | Path,
     max_gameweek: int,
+    transfer_rules: Iterable[TransferRule] | None = None,
 ) -> pd.DataFrame:
     """Derive each team's roster for every gameweek from initial picks and transfers."""
     required_columns = {"name", "team_name", "pick_slot", "player_id"}
@@ -569,6 +575,8 @@ def build_weekly_rosters(
         initial_rosters[str(team_name)] = roster
 
     records = load_transfer_records(transfer_ledger_path)
+    if transfer_rules is not None:
+        records = filter_transfer_records_for_rules(records, transfer_rules)
     transfers_by_team = {}
     for record in records:
         if record["action_type"] == "transfer":
@@ -597,12 +605,15 @@ def build_weekly_rosters(
                     outgoing_id = transfer["player_out_id"]
                     incoming_id = transfer["player_in_id"]
                 else:
+                    original_outgoing_id = transfer["player_out_id"]
+                    original_incoming_id = transfer["player_in_id"]
+                    if (
+                        original_outgoing_id not in roster
+                        and original_incoming_id in roster
+                    ):
+                        roster[roster.index(original_incoming_id)] = original_outgoing_id
                     outgoing_id = correction["player_out_id"]
                     incoming_id = correction["player_in_id"]
-                    original_incoming_id = transfer["player_in_id"]
-                    if outgoing_id not in roster and original_incoming_id in roster:
-                        roster[roster.index(original_incoming_id)] = incoming_id
-                        continue
                 if outgoing_id in roster:
                     roster[roster.index(outgoing_id)] = incoming_id
             roster_rows.append(
@@ -623,6 +634,7 @@ def calculate_weekly_results(
     gameweek_goals: pd.DataFrame,
     roster_path: str | Path | None = None,
     max_gameweek: int | None = None,
+    transfer_rules: Iterable[TransferRule] | None = None,
 ) -> pd.DataFrame:
     """Calculate manager goals from gameweek-level roster ownership."""
     if not {"name", "team_name", "player_id"}.issubset(picks.columns):
@@ -633,7 +645,12 @@ def calculate_weekly_results(
     if max_gameweek is None:
         max_gameweek = int(gameweek_goals["gameweek"].max()) if not gameweek_goals.empty else 1
     if roster_path is not None:
-        rosters = build_weekly_rosters(picks, roster_path, max_gameweek)
+        rosters = build_weekly_rosters(
+            picks,
+            roster_path,
+            max_gameweek,
+            transfer_rules=transfer_rules,
+        )
     else:
         roster_keys = picks[["team_name", "player_id"]].drop_duplicates()
         gameweeks = pd.DataFrame({"gameweek": range(1, max_gameweek + 1)})

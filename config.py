@@ -10,8 +10,9 @@ transfer_rules: list[dict] = [
     {
         "season_id": season_id,
         "gameweek": 10,
-        "deadline_utc": "2026-09-01T20:00:00Z",
-        "max_transfers_per_team": 2,
+        "start_utc": "2026-10-07T00:00:00Z",
+        "deadline_utc": "2026-11-12T20:00:00Z",
+        "max_transfers_per_team": 1,
     }
 ]
 

@@ -1,3 +1,5 @@
-team_name,player_out_id,player_out_name,player_in_id,player_in_name,player_in_club,submitted_at_utc
-Chelsea Dagger,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,2026-10-05T15:08:05+00:00
-Beth's Booming Army!,WSL_0356,Kadidiatou Diani,WSL_0119,Hannah Hampton,Chelsea,2026-10-05T21:18:04+00:00
+team_name,season_id,rule_id,transfer_id,player_out_id,player_out_name,player_in_id,player_in_name,player_in_club,effective_gameweek,submitted_at_utc,action_type,correction_of_transfer_id,correction_reason
+Chelsea Dagger,legacy,legacy,,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,10,2026-10-05T15:08:05+00:00,transfer,,
+Beth's Booming Army!,legacy,legacy,,WSL_0356,Kadidiatou Diani,WSL_0119,Hannah Hampton,Chelsea,10,2026-10-05T21:18:04+00:00,transfer,,
+Chelsea Dagger,2026-27,2026-27-GW10,53f240fe-7b66-49ac-8914-8a5be3595aeb,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,10,2026-10-09T13:29:04+00:00,transfer,,
+Chelsea Dagger,2026-27,2026-27-GW10,76edc628-f07c-4c16-af3f-8acc43d296c5,WSL_0232,Vivianne Miedema,WSL_0123,Aggie Beever-Jones,Chelsea,10,2026-10-09T13:33:14+00:00,correction,53f240fe-7b66-49ac-8914-8a5be3595aeb,Updated by team during transfer window

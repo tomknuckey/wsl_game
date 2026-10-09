@@ -17,6 +17,7 @@ class TransferRule:
     gameweek: int
     deadline_utc: str | datetime
     max_transfers_per_team: int
+    start_utc: str | datetime | None = None
 
     def __post_init__(self) -> None:
         if not str(self.season_id).strip():
@@ -27,9 +28,11 @@ class TransferRule:
             self.max_transfers_per_team, int
         ) or self.max_transfers_per_team < 1:
             raise ValueError("Transfer rule maximum must be a positive integer.")
+        if self.start_datetime_utc >= self._parse_utc_datetime(self.deadline_utc):
+            raise ValueError("Transfer rule start must be before its deadline.")
 
     @staticmethod
-    def _parse_deadline(value: str | datetime) -> datetime:
+    def _parse_utc_datetime(value: str | datetime) -> datetime:
         if isinstance(value, datetime):
             deadline = value
         else:
@@ -39,12 +42,96 @@ class TransferRule:
         return deadline.astimezone(timezone.utc)
 
     @property
+    def start_datetime_utc(self) -> datetime:
+        if self.start_utc is None:
+            return datetime.min.replace(tzinfo=timezone.utc)
+        return self._parse_utc_datetime(self.start_utc)
+
+    @property
+    def deadline_datetime_utc(self) -> datetime:
+        return self._parse_utc_datetime(self.deadline_utc)
+
+    @property
     def rule_id(self) -> str:
         return f"{self.season_id}-GW{self.gameweek}"
 
+    def has_started(self, submitted_at: datetime | None = None) -> bool:
+        submitted_at = submitted_at or datetime.now(timezone.utc)
+        return self.start_datetime_utc <= self._parse_utc_datetime(submitted_at)
+
     def is_open(self, submitted_at: datetime | None = None) -> bool:
         submitted_at = submitted_at or datetime.now(timezone.utc)
-        return self._parse_deadline(self.deadline_utc) > submitted_at.astimezone(timezone.utc)
+        submitted_at = self._parse_utc_datetime(submitted_at)
+        return self.start_datetime_utc <= submitted_at < self.deadline_datetime_utc
+
+
+def format_utc_datetime(value: str | datetime) -> str:
+    """Format a transfer-rule timestamp for participant-facing display."""
+    timestamp = TransferRule._parse_utc_datetime(value)
+    return (
+        f"{timestamp:%A}, {timestamp.day} {timestamp:%B %Y} "
+        f"at {timestamp:%H:%M} UTC"
+    )
+
+
+def transfer_rules_from_config(
+    configured_rules: Iterable[Mapping[str, object]],
+) -> list[TransferRule]:
+    """Build validated transfer rules from config dictionaries."""
+    return [
+        TransferRule(
+            season_id=str(rule["season_id"]),
+            gameweek=int(rule["gameweek"]),
+            start_utc=str(rule["start_utc"]),
+            deadline_utc=str(rule["deadline_utc"]),
+            max_transfers_per_team=int(rule["max_transfers_per_team"]),
+        )
+        for rule in configured_rules
+    ]
+
+
+def filter_transfer_records_for_rules(
+    records: Iterable[Mapping[str, str]],
+    rules: Iterable[TransferRule],
+) -> list[dict[str, str]]:
+    """Exclude transfers submitted before the start of their configured rule."""
+    configured_rules = list(rules)
+    rules_by_id = {rule.rule_id: rule for rule in configured_rules}
+    eligible_transfers: list[dict[str, str]] = []
+    eligible_transfer_ids: set[str] = set()
+    corrections: list[dict[str, str]] = []
+    other_records: list[dict[str, str]] = []
+
+    for source_record in records:
+        record = dict(source_record)
+        rule = rules_by_id.get(record["rule_id"])
+        if rule is None and record["season_id"] == "legacy":
+            legacy_candidates = [
+                configured_rule
+                for configured_rule in configured_rules
+                if configured_rule.gameweek == int(record["effective_gameweek"])
+            ]
+            if len(legacy_candidates) == 1:
+                rule = legacy_candidates[0]
+        submitted_at = TransferRule._parse_utc_datetime(record["submitted_at_utc"])
+        if rule is not None and not rule.is_open(submitted_at):
+            continue
+
+        if record["action_type"] == "transfer":
+            eligible_transfers.append(record)
+            if record["transfer_id"]:
+                eligible_transfer_ids.add(record["transfer_id"])
+        elif record["action_type"] == "correction":
+            corrections.append(record)
+        else:
+            other_records.append(record)
+
+    eligible_corrections = [
+        correction
+        for correction in corrections
+        if correction["correction_of_transfer_id"] in eligible_transfer_ids
+    ]
+    return eligible_transfers + eligible_corrections + other_records
 
 
 TRANSFER_FIELDS = (
@@ -159,6 +246,8 @@ def record_correction(
     roster_ids = [str(player_id) for player_id in current_player_ids]
     if not roster_ids or len(roster_ids) != len(set(roster_ids)):
         raise ValueError("The current roster is missing or duplicated.")
+    if player_out_id not in roster_ids:
+        raise ValueError("The outgoing player is not on the pre-transfer roster.")
     if player_in_id in roster_ids or player_in_id == player_out_id:
         raise ValueError("The incoming player must be different and not already on the roster.")
 
@@ -176,15 +265,16 @@ def record_correction(
         )
         if original_transfer is None or original_transfer["action_type"] != "transfer":
             raise ValueError("The referenced transfer does not exist.")
-        if player_out_id != original_transfer["player_out_id"]:
-            raise ValueError("A correction must keep the original outgoing player.")
 
         rule = rule or TransferRule(
             season_id="legacy",
             gameweek=effective_gameweek,
-            deadline_utc=datetime.now(timezone.utc),
+            deadline_utc=datetime.max.replace(tzinfo=timezone.utc),
             max_transfers_per_team=1,
         )
+        submitted_at = datetime.now(timezone.utc)
+        if not rule.is_open(submitted_at):
+            raise ValueError("The transfer window is not open.")
         record = {
             "team_name": team_name,
             "season_id": rule.season_id,
@@ -196,7 +286,7 @@ def record_correction(
             "player_in_name": player_in_name,
             "player_in_club": player_in_club,
             "effective_gameweek": str(effective_gameweek),
-            "submitted_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "submitted_at_utc": submitted_at.isoformat(timespec="seconds"),
             "action_type": "correction",
             "correction_of_transfer_id": original_transfer["transfer_id"],
             "correction_reason": correction_reason.strip(),
@@ -229,12 +319,34 @@ def get_active_team_transfer(
         dict(record)
         for record in records
         if normalise_team_name(record["team_name"]) == normalized_team
-        and record["action_type"] == "transfer"
     ]
-    if not team_records:
+    transfers = [
+        record for record in team_records if record["action_type"] == "transfer"
+    ]
+    if not transfers:
         return None
 
-    return max(team_records, key=lambda record: record["submitted_at_utc"])
+    active_transfer = max(transfers, key=lambda record: record["submitted_at_utc"])
+    corrections = [
+        record
+        for record in team_records
+        if record["action_type"] == "correction"
+        and record["correction_of_transfer_id"] == active_transfer["transfer_id"]
+    ]
+    if corrections:
+        latest_correction = max(
+            corrections,
+            key=lambda record: record["submitted_at_utc"],
+        )
+        for field in (
+            "player_out_id",
+            "player_out_name",
+            "player_in_id",
+            "player_in_name",
+            "player_in_club",
+        ):
+            active_transfer[field] = latest_correction[field]
+    return active_transfer
 
 
 def record_transfer(
@@ -263,7 +375,7 @@ def record_transfer(
     rule = rule or TransferRule(
         season_id=season_id,
         gameweek=effective_gameweek,
-        deadline_utc=datetime.now(timezone.utc),
+        deadline_utc=datetime.max.replace(tzinfo=timezone.utc),
         max_transfers_per_team=max_transfers,
     )
     if rule.season_id != season_id and season_id != "legacy":
@@ -290,6 +402,10 @@ def record_transfer(
     if len(new_roster_ids) != len(roster_ids) or len(new_roster_ids) != len(set(new_roster_ids)):
         raise ValueError("The transfer would create a duplicate player or change roster size.")
 
+    submitted_at = datetime.now(timezone.utc)
+    if not rule.is_open(submitted_at):
+        raise ValueError("The transfer window is not open.")
+
     record = {
         "team_name": team_name,
         "season_id": rule.season_id,
@@ -301,7 +417,7 @@ def record_transfer(
         "player_in_name": player_in_name,
         "player_in_club": player_in_club,
         "effective_gameweek": str(effective_gameweek),
-        "submitted_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "submitted_at_utc": submitted_at.isoformat(timespec="seconds"),
         "action_type": "transfer",
         "correction_of_transfer_id": "",
         "correction_reason": "",
@@ -316,6 +432,11 @@ def record_transfer(
             if normalise_team_name(existing_record["team_name"]) == normalized_team
             and existing_record["season_id"] == rule.season_id
             and existing_record["action_type"] == "transfer"
+            and rule.is_open(
+                TransferRule._parse_utc_datetime(
+                    existing_record["submitted_at_utc"]
+                )
+            )
         )
         if prior_transfer_count >= rule.max_transfers_per_team:
             raise ValueError(
