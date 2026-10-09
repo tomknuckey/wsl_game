@@ -5,8 +5,8 @@ import streamlit as st
 
 from config import data_source, max_gw
 from utils.general_utils import (
-    generate_weekly_goals,
-    generate_weekly_manager_results,
+    calculate_weekly_results,
+    generate_gameweek_goals,
     load_reference_sheet,
 )
 
@@ -62,9 +62,9 @@ def cumulative_history(
         return pd.DataFrame(index=gameweeks)
 
     weekly = (
-        pdf_weekly.groupby(["gw", entity_column], as_index=False)["goals"]
+        pdf_weekly.groupby(["gameweek", entity_column], as_index=False)["goals"]
         .sum()
-        .pivot(index="gw", columns=entity_column, values="goals")
+        .pivot(index="gameweek", columns=entity_column, values="goals")
     )
     return (
         weekly.reindex(index=gameweeks, columns=entity_ids, fill_value=0)
@@ -93,16 +93,19 @@ pdf_manager_picks = load_csv(f"data/intermediate/{DATA_SOURCE}/player_pics.csv")
 pdf_reference = load_reference_sheet(
     f"data/input/{DATA_SOURCE}/player_reference.csv"
 )
-pdf_weekly_goals = generate_weekly_goals(max_gw, DATA_SOURCE)
+pdf_weekly_goals = generate_gameweek_goals(max_gw, DATA_SOURCE)
 pdf_weekly_manager_results = pd.DataFrame(
-    columns=["name", "team_name", "gw", "goals"]
+    columns=["name", "team_name", "gameweek", "goals"]
 )
 if not pdf_manager_picks.empty and not pdf_pics.empty:
-    pdf_prep = pdf_reference[["player_id", "full_name"]].merge(
+    pdf_prep = pdf_reference.merge(
         pdf_manager_picks, how="inner", on="full_name"
     )
-    pdf_weekly_manager_results = generate_weekly_manager_results(
-        pdf_prep, pdf_pics, pdf_weekly_goals
+    pdf_weekly_manager_results = calculate_weekly_results(
+        pdf_prep,
+        pdf_weekly_goals,
+        roster_path="data/team_transfers.csv",
+        max_gameweek=max_gw,
     )
 
 # Human-readable display names for tables
@@ -240,7 +243,7 @@ if pdf_weekly_goals.empty:
 elif pdf_reference.empty:
     st.info("Player reference data is not available yet.")
 else:
-    gameweeks = sorted(pdf_weekly_goals["gw"].unique().tolist())
+    gameweeks = sorted(pdf_weekly_goals["gameweek"].unique().tolist())
     player_reference = pdf_reference.drop_duplicates("player_id").copy()
     player_reference["player_id"] = player_reference["player_id"].astype(str)
     weekly_goals = pdf_weekly_goals.copy()
@@ -315,7 +318,7 @@ else:
                     pdf_weekly_manager_results["name"].eq(manager[0])
                     & pdf_weekly_manager_results["team_name"].eq(manager[1])
                 ]
-                manager_series = manager_weekly.set_index("gw")["goals"].reindex(
+                manager_series = manager_weekly.set_index("gameweek")["goals"].reindex(
                     gameweeks, fill_value=0
                 )
                 manager_chart[f"{manager[0]} ({manager[1]})"] = (
