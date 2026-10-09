@@ -3,7 +3,7 @@ import random
 from config import (
     data_source,
     max_gw,
-    transfer_gameweek,
+    transfer_rules,
 )
 from utils.general_utils import (
     calculate_weekly_results,
@@ -14,6 +14,7 @@ from utils.general_utils import (
     number_of_pics,
     load_reference_sheet,
 )
+from utils.transfer_utils import transfer_rules_from_config
 
 import logging
 from pathlib import Path
@@ -54,6 +55,7 @@ weekly_results = calculate_weekly_results(
     pdf_goals_by_gameweek,
     roster_path="data/team_transfers.csv",
     max_gameweek=max_gw,
+    transfer_rules=transfer_rules_from_config(transfer_rules),
 )
 pdf_results = (
     weekly_results.groupby(["name", "team_name"], dropna=False)["goals"]
@@ -63,4 +65,4 @@ pdf_results = (
 )
 pdf_results.to_csv(output_dir / "results.csv", index=False)
 
-logging.info("Results saved to CSV; transfer gameweek: %s", transfer_gameweek)
+logging.info("Results saved to CSV; transfer rules: %s", transfer_rules)

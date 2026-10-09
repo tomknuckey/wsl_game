@@ -1,8 +1,8 @@
 ## WSL Fantasy Game
 
-The project processes form submissions and weekly player goals into CSV reports, then displays them in a public Overall Results page. A separate Team Pics page lets each participant enter their team name and unique four-digit access code to view that team's picks and save one one-player-out/one-player-in transfer.
+The project processes form submissions and weekly player goals into CSV reports, then displays them in a public Overall Results page. A separate Team Pics page lets each participant enter their team name and unique four-digit access code to view that team's picks and save a one-player-out/one-player-in transfer during its configured UTC start-to-deadline window.
 
-Team access codes are in `data/team_access_codes.csv` and are tracked in Git. Anyone with repository access can read the codes, so they should be considered low-assurance access codes, not private credentials. The transfer ledger is `data/team_transfers.csv`; the app enforces one transfer per team and updates the displayed roster from the ledger. Local CSV writes are inspectable, but Streamlit Community Cloud may discard filesystem changes when the app restarts or redeploys. Use persistent transactional storage before relying on hosted transfer records. Run tests with `python -m unittest discover -s tests`.
+Team access codes are in `data/team_access_codes.csv` and are tracked in Git. Anyone with repository access can read the codes, so they should be considered low-assurance access codes, not private credentials. Transfer windows, limits, and effective gameweeks are configured in `config.py`. The transfer ledger is `data/team_transfers.csv`; entries submitted before a rule's `start_utc` or at/after its `deadline_utc` are excluded from rosters, results, and the transfer limit. Local CSV writes are inspectable, but Streamlit Community Cloud may discard filesystem changes when the app restarts or redeploys. Use persistent transactional storage before relying on hosted transfer records. Run tests with `python -m unittest discover -s tests`.
 
 Live app: <https://wslplayerpics.streamlit.app/>
 

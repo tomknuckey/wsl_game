@@ -1,3 +1,4 @@
+import csv
 import tempfile
 import unittest
 from pathlib import Path
@@ -63,7 +64,7 @@ class WeeklyRosterTests(unittest.TestCase):
         rule = TransferRule(
             season_id="2026-27",
             gameweek=10,
-            deadline_utc="2026-09-01T20:00:00Z",
+            deadline_utc="2099-09-01T20:00:00Z",
             max_transfers_per_team=2,
         )
         record_transfer(
@@ -118,7 +119,7 @@ class WeeklyRosterTests(unittest.TestCase):
         record_correction(
             self.ledger_path,
             team_name="Chelsea Dagger",
-            current_player_ids=["F", "B", "C", "D", "E"],
+            current_player_ids=["A", "B", "C", "D", "E"],
             player_out_id="A",
             player_out_name="Player A",
             player_in_id="G",
@@ -142,6 +143,91 @@ class WeeklyRosterTests(unittest.TestCase):
         )
         self.assertEqual(len(corrected_records), 2)
         self.assertEqual(corrected_records[1]["correction_of_transfer_id"], records[0]["transfer_id"])
+
+    def test_correction_can_replace_both_transfer_players(self) -> None:
+        original = record_transfer(
+            self.ledger_path,
+            team_name="Chelsea Dagger",
+            current_player_ids=["A", "B", "C", "D", "E"],
+            player_out_id="A",
+            player_out_name="Player A",
+            player_in_id="F",
+            player_in_name="Player F",
+            player_in_club="Club F",
+            effective_gameweek=10,
+        )
+        record_correction(
+            self.ledger_path,
+            team_name="Chelsea Dagger",
+            current_player_ids=["A", "B", "C", "D", "E"],
+            player_out_id="B",
+            player_out_name="Player B",
+            player_in_id="G",
+            player_in_name="Player G",
+            player_in_club="Club G",
+            correction_of_transfer_id=original["transfer_id"],
+            correction_reason="Change both transfer selections",
+            effective_gameweek=10,
+        )
+        picks = pd.DataFrame(
+            [
+                ["Manager One", "Chelsea Dagger", slot, player_id]
+                for slot, player_id in enumerate(["A", "B", "C", "D", "E"], start=1)
+            ],
+            columns=["name", "team_name", "pick_slot", "player_id"],
+        )
+
+        rosters = build_weekly_rosters(picks, self.ledger_path, max_gameweek=10)
+
+        self.assertEqual(
+            rosters.loc[rosters["gameweek"] == 10, "player_id"].tolist(),
+            ["A", "G", "C", "D", "E"],
+        )
+
+    def test_transfer_submitted_before_rule_start_is_not_applied_to_roster(self) -> None:
+        record = record_transfer(
+            self.ledger_path,
+            team_name="Chelsea Dagger",
+            current_player_ids=["A", "B", "C", "D", "E"],
+            player_out_id="A",
+            player_out_name="Player A",
+            player_in_id="F",
+            player_in_name="Player F",
+            player_in_club="Club F",
+            effective_gameweek=10,
+        )
+        record["season_id"] = "2026-27"
+        record["rule_id"] = "2026-27-GW10"
+        record["submitted_at_utc"] = "2026-10-09T23:59:59+00:00"
+        with self.ledger_path.open("w", newline="", encoding="utf-8") as ledger_file:
+            writer = csv.DictWriter(ledger_file, fieldnames=record.keys())
+            writer.writeheader()
+            writer.writerow(record)
+
+        picks = pd.DataFrame(
+            [["Manager One", "Chelsea Dagger", slot, player_id]
+             for slot, player_id in enumerate(["A", "B", "C", "D", "E"], start=1)],
+            columns=["name", "team_name", "pick_slot", "player_id"],
+        )
+        rule = TransferRule(
+            season_id="2026-27",
+            gameweek=10,
+            start_utc="2026-10-10T00:00:00Z",
+            deadline_utc="2026-10-12T20:00:00Z",
+            max_transfers_per_team=1,
+        )
+
+        rosters = build_weekly_rosters(
+            picks,
+            self.ledger_path,
+            max_gameweek=10,
+            transfer_rules=[rule],
+        )
+
+        self.assertEqual(
+            rosters.loc[rosters["gameweek"] == 10, "player_id"].tolist(),
+            ["A", "B", "C", "D", "E"],
+        )
 
     def test_goals_are_shared_by_weekly_roster_ownership(self) -> None:
         picks = pd.DataFrame(
