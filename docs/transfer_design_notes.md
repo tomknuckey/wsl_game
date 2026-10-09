@@ -94,18 +94,16 @@ The current Streamlit Community Cloud deployment can remain part of the process,
 
 The main scoring and dataframe helpers currently live together in `utils/general_utils.py`. Refactor the touched behavior as the transfer work is implemented; avoid a broad rewrite of unrelated pipeline code.
 
-## Decisions To Make Before Implementation
+## Decisions And Current Implementation
 
-- Does a transfer submitted before the GW10 deadline apply from GW10 onward?
-- Is a submitted transfer final, or may it be edited or replaced before the deadline?
-- Is the transfer limit per team per season, or per manager across seasons? It will be configurable, but its scope still needs defining.
-- How are goals shared when multiple managers own the same scorer: separately per gameweek, or by another rule?
-- Is the low-assurance access code acceptable for this game's privacy expectations, and should each participant have a unique code?
-- What timezone defines the configured deadline?
-- Are initial rosters imported from the current Google Form responses, and who verifies the identity-to-team mapping?
-- Is a submitted transfer final, or may it be edited or replaced before the deadline?
-- Who can correct a mistaken transfer, and how should corrections be recorded?
-- What backup and recovery process is appropriate for the hosted transfer data?
+- A transfer submitted before the GW10 deadline applies from GW10 onward.
+- A submitted transfer is final after the deadline. Before the deadline, a correction may be recorded without replacing the original transfer row.
+- The transfer limit is per team per season and is configurable in `config.py`.
+- Goals are shared among managers who pick the same player in the same gameweek.
+- The configured deadline uses Europe/London (British Summer Time).
+- The initial roster is imported from the existing Google Form responses; the current access-code mapping is the participant-to-team authority.
+- Corrections are recorded as audit rows and require a reason. They do not count as additional transfers.
+- Hosted transfer data requires persistent transactional storage and a backup/recovery process before production use.
 
 ## Documentation Follow-Up
 

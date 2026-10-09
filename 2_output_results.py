@@ -3,15 +3,15 @@ import random
 from config import (
     data_source,
     max_gw,
+    transfer_gameweek,
 )
 from utils.general_utils import (
+    calculate_weekly_results,
     generate_best_differential,
-    generate_goals,
+    generate_gameweek_goals,
     generate_manager_ownership,
     generate_top_missed,
     number_of_pics,
-    adjust_goals,
-    generate_results,
     load_reference_sheet,
 )
 
@@ -36,19 +36,31 @@ pdf_pics = number_of_pics(pdf_prep, output_dir)
 
 generate_manager_ownership(pdf_prep, pdf_pics, output_dir)
 
-pdf_goals_agg = generate_goals(max_gw, data_source).merge(
-    pdf_reference[["player_id", "full_name", "team"]], how="left", on="player_id"
+pdf_goals_by_gameweek = generate_gameweek_goals(max_gw, data_source)
+pdf_goals_agg = pdf_goals_by_gameweek.groupby("player_id").agg(
+    {"goals": "sum"}
+).reset_index().merge(
+    pdf_reference[["player_id", "full_name", "team"]],
+    how="left",
+    on="player_id",
 )
 pdf_goals_agg.sort_values("goals", ascending=False).to_csv(output_dir / "pdf_goals_agg.csv", index=False)
 
 generate_top_missed(pdf_goals_agg, pdf_pics, output_dir)
 generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep, output_dir)
 
-pdf_results= (
-    pdf_prep.merge(pdf_goals_agg, how="left", on="player_id")
-    .merge(pdf_pics, how="left", on="player_id")
-    .pipe(adjust_goals)
-    .pipe(generate_results, output_dir)
+weekly_results = calculate_weekly_results(
+    pdf_prep,
+    pdf_goals_by_gameweek,
+    roster_path="data/team_transfers.csv",
+    max_gameweek=max_gw,
 )
+pdf_results = (
+    weekly_results.groupby(["name", "team_name"], dropna=False)["goals"]
+    .sum()
+    .round(2)
+    .reset_index()
+)
+pdf_results.to_csv(output_dir / "results.csv", index=False)
 
-logging.info("Results saved to CSV")
+logging.info("Results saved to CSV; transfer gameweek: %s", transfer_gameweek)
