@@ -1,6 +1,6 @@
 # Data source directory name
-#data_source: str = "test"
-data_source = "actual"
+data_source: str = "test"
+#data_source = "actual"
 # Entries submitted after this deadline are excluded from the results
 submission_deadline: str = "03/09/2026 20:00:00"
 
