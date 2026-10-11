@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
-from config import season_id, transfer_rules
+from config import data_source, season_id, transfer_rules
 from utils.access_code_utils import authenticate_team, load_team_access_codes
 from utils.general_utils import build_weekly_rosters
 from utils.transfer_utils import (
@@ -20,13 +20,18 @@ from utils.transfer_utils import (
 
 
 st.set_page_config(page_title="Team Pics | WSL Fantasy Game", page_icon="⚽")
-TRANSFER_LEDGER_PATH = Path("data/team_transfers.csv")
+DATA_INPUT_DIR = Path("data/input") / data_source
+TRANSFER_LEDGER_PATH = (
+    Path("data/team_transfers.csv")
+    if data_source == "actual"
+    else DATA_INPUT_DIR / "team_transfers.csv"
+)
 
 
 @st.cache_data
-def load_team_picks() -> pd.DataFrame:
-    picks = pd.read_csv("data/intermediate/actual/player_pics.csv")
-    reference = pd.read_csv("data/input/actual/player_reference.csv")
+def load_team_picks(source: str = data_source) -> pd.DataFrame:
+    picks = pd.read_csv(Path("data/intermediate") / source / "player_pics.csv")
+    reference = pd.read_csv(Path("data/input") / source / "player_reference.csv")
     return picks.merge(
         reference[["full_name", "team", "player_id"]],
         on="full_name",
@@ -36,8 +41,8 @@ def load_team_picks() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_player_reference() -> pd.DataFrame:
-    return pd.read_csv("data/input/actual/player_reference.csv")
+def load_player_reference(source: str = data_source) -> pd.DataFrame:
+    return pd.read_csv(Path("data/input") / source / "player_reference.csv")
 
 
 st.title("Your Team Picks")
@@ -71,17 +76,17 @@ if st.session_state["team_pics_team_name"] is None:
             st.error("Team name or password is incorrect.")
 else:
     selected_team = st.session_state["team_pics_team_name"]
-    picks = load_team_picks()
+    picks = load_team_picks(data_source)
     team_picks = picks[
         picks["team_name"].map(lambda value: " ".join(value.split()).casefold())
         == " ".join(selected_team.split()).casefold()
     ]
-    player_reference = load_player_reference()
+    player_reference = load_player_reference(data_source)
     players_by_id = player_reference.set_index("player_id").to_dict("index")
     current_gameweek = max(
         (
             int(path.stem.partition("_")[2])
-            for path in Path("data/input/actual/player_goals").glob("GW_*.csv")
+            for path in (DATA_INPUT_DIR / "player_goals").glob("GW_*.csv")
             if path.stem.partition("_")[2].isdigit()
         ),
         default=1,

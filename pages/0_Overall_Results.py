@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from config import data_source
 
 
 def get_manager_count(pdf: pd.DataFrame) -> int:
@@ -16,19 +17,19 @@ def get_manager_count(pdf: pd.DataFrame) -> int:
     return 0
 
 
-def get_weeks_of_data(data_source: str = "actual") -> int:
+def get_weeks_of_data(source: str = data_source) -> int:
     """Count the number of weekly GW CSVs without storing any separate metadata."""
-    goals_dir = Path("data/input") / data_source / "player_goals"
+    goals_dir = Path("data/input") / source / "player_goals"
     if not goals_dir.exists():
         return 0
     return len(sorted(goals_dir.glob("GW_*.csv")))
 
 
-def load_csv(path: str) -> pd.DataFrame:
+def load_csv(path: str, columns: list[str] | None = None) -> pd.DataFrame:
     """Load a CSV if it exists and return an empty DataFrame otherwise."""
     csv_path = Path(path)
     if not csv_path.exists():
-        return pd.DataFrame()
+        return pd.DataFrame(columns=columns)
     return pd.read_csv(csv_path)
 
 
@@ -50,12 +51,29 @@ st.set_page_config(
 
 
 # Load data
-pdf_results = load_csv("data/output/actual/results.csv")
-pdf_pics = load_csv("data/output/actual/player_pics.csv")
-pdf_goals_agg = load_csv("data/output/actual/pdf_goals_agg.csv")
-pdf_manager_ownership = load_csv("data/output/actual/manager_ownership.csv")
-pdf_best_differential = load_csv("data/output/actual/best_differential.csv")
-pdf_top_missed = load_csv("data/output/actual/top_missed.csv")
+output_dir = Path("data/output") / data_source
+pdf_results = load_csv(str(output_dir / "results.csv"))
+pdf_pics = load_csv(str(output_dir / "player_pics.csv"))
+pdf_goals_agg = load_csv(str(output_dir / "pdf_goals_agg.csv"))
+pdf_manager_ownership = load_csv(str(output_dir / "manager_ownership.csv"))
+pdf_best_differential = load_csv(str(output_dir / "best_differential.csv"))
+pdf_top_missed = load_csv(str(output_dir / "top_missed.csv"))
+pdf_manager_player_points = load_csv(
+    str(output_dir / "manager_player_points.csv"),
+    columns=["name", "team_name", "player_id", "full_name", "team", "goals"],
+)
+pdf_manager_player_gameweek_points = load_csv(
+    str(output_dir / "manager_player_gameweek_points.csv"),
+    columns=[
+        "name",
+        "team_name",
+        "player_id",
+        "full_name",
+        "team",
+        "gameweek",
+        "goals",
+    ],
+)
 
 # Human-readable display names for tables
 pdf_results = humanise_columns(
@@ -101,6 +119,29 @@ pdf_top_missed = humanise_columns(
     pdf_top_missed,
     {"full_name": "Player", "team": "Club", "goals": "Goals"},
 )[["Player", "Club", "Goals"]]
+
+pdf_manager_player_points = humanise_columns(
+    pdf_manager_player_points,
+    {
+        "name": "Manager",
+        "team_name": "Team Name",
+        "full_name": "Player",
+        "team": "Club",
+        "goals": "Points",
+    },
+)[["Manager", "Team Name", "Player", "Club", "Points"]]
+
+pdf_manager_player_gameweek_points = humanise_columns(
+    pdf_manager_player_gameweek_points,
+    {
+        "name": "Manager",
+        "team_name": "Team Name",
+        "full_name": "Player",
+        "team": "Club",
+        "gameweek": "Gameweek",
+        "goals": "Points",
+    },
+)[["Manager", "Team Name", "Player", "Club", "Gameweek", "Points"]]
 
 
 # Custom styling
@@ -163,7 +204,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(
         label="Weeks of data",
-        value=get_weeks_of_data("actual"),
+        value=get_weeks_of_data(),
     )
 
 with col2:
@@ -189,13 +230,15 @@ st.dataframe(
 # Additional information
 st.header("Game Data")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
     [
         "⚽ Top Scorers",
         "👥 Player Ownership",
         "📊 Player Information",
         "⭐ Best Differential",
         "⚠️ Top Missed",
+        "👤 Manager Player Points",
+        "📅 Manager Player by Gameweek",
     ]
 )
 
@@ -230,6 +273,20 @@ with tab4:
 with tab5:
     st.dataframe(
         pdf_top_missed,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+with tab6:
+    st.dataframe(
+        pdf_manager_player_points,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+with tab7:
+    st.dataframe(
+        pdf_manager_player_gameweek_points,
         use_container_width=True,
         hide_index=True,
     )

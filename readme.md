@@ -18,7 +18,8 @@ pip install -r requirements.txt
 
 ## Run Locally
 
-To display the latest reports already present in `data/output/actual/`:
+To display the latest reports already present in `data/output/<data_source>/`
+(using the `data_source` selected in `config.py`):
 
 ```powershell
 streamlit run app.py
@@ -31,9 +32,21 @@ python 1_prepare_forms.py
 python 2_output_results.py
 ```
 
+To prepare and regenerate the isolated test data without changing `config.py` or
+the actual reports:
+
+```powershell
+python 1_prepare_forms.py --data-source test
+python 2_output_results.py --data-source test
+```
+
 The first stage reads form responses and player reference data from `data/input/<data_source>/` and writes cleaned picks to `data/intermediate/<data_source>/`. The second stage reads those picks and the weekly goals, then writes reports to `data/output/<data_source>/`.
 
-The selected data source and other pipeline options are in `config.py`; it currently selects `actual`. Check this setting before running the pipeline: generated CSVs in the selected output directory may be replaced.
+The selected data source and other pipeline options are in `config.py`; it currently selects `actual`. The optional `--data-source` argument overrides only the source for that pipeline run. Check the selected output directory before running the pipeline: its generated CSVs may be replaced. The `test` source has its own transfer ledger at `data/input/test/team_transfers.csv`; the `actual` source continues to use `data/team_transfers.csv`.
+
+The output includes `manager_player_gameweek_points.csv` (one row per manager, rostered player, and gameweek with data) and `manager_player_points.csv` (the same player contributions summed over the season). A zero in the `goals` column means that player earned no points that week; shared goal credit is divided between managers who own the player that week.
+
+The test source includes a sample transfer for Chelsea Dagger: Vivianne Miedema out and Océane Hurtré in, submitted during GW4 and effective from GW5. Its GW5 goals data includes Hurtré, so Tom Knuckey's player-by-week report shows the GW5 contribution.
 
 ## Input Data
 

@@ -5,8 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from config import transfer_rules as configured_transfer_rules
 from utils.general_utils import (
     build_weekly_rosters,
+    calculate_player_weekly_results,
     calculate_weekly_results,
     generate_gameweek_goals,
 )
@@ -15,6 +17,7 @@ from utils.transfer_utils import (
     load_transfer_records,
     record_correction,
     record_transfer,
+    transfer_rules_from_config,
 )
 
 
@@ -258,6 +261,94 @@ class WeeklyRosterTests(unittest.TestCase):
         goals = generate_gameweek_goals(11, "actual", goals_dir=Path(self.temp_directory.name))
 
         self.assertEqual(goals.to_dict("records"), [{"player_id": "A", "gameweek": 10, "goals": 2}])
+
+    def test_test_fixture_miedema_transfer_awards_hurtre_gw5_goal(self) -> None:
+        repository_root = Path(__file__).resolve().parents[1]
+        input_dir = repository_root / "data" / "input" / "test"
+        reference = pd.read_csv(input_dir / "player_reference.csv")
+        picks_path = (
+            repository_root
+            / "data"
+            / "intermediate"
+            / "test"
+            / "player_pics.csv"
+        )
+        picks = pd.read_csv(picks_path).merge(
+            reference[["full_name", "player_id"]],
+            on="full_name",
+            how="inner",
+            validate="many_to_one",
+        )
+        ledger_path = input_dir / "team_transfers.csv"
+        transfer_rules = transfer_rules_from_config(configured_transfer_rules)
+        goals = generate_gameweek_goals(
+            6,
+            "test",
+            goals_dir=input_dir / "player_goals",
+        )
+        rosters = build_weekly_rosters(
+            picks,
+            ledger_path,
+            max_gameweek=5,
+            transfer_rules=transfer_rules,
+        )
+        player_weekly_results = calculate_player_weekly_results(
+            picks,
+            goals,
+            roster_path=ledger_path,
+            max_gameweek=5,
+            transfer_rules=transfer_rules,
+        )
+        weekly_results = calculate_weekly_results(
+            picks,
+            goals,
+            roster_path=ledger_path,
+            max_gameweek=5,
+            transfer_rules=transfer_rules,
+        )
+        outgoing_id = reference.loc[
+            reference["full_name"] == "Vivianne Miedema", "player_id"
+        ].iloc[0]
+        incoming_id = reference.loc[
+            reference["full_name"] == "Océane Hurtré", "player_id"
+        ].iloc[0]
+        tom_gw5_hurtre_points = player_weekly_results.loc[
+            (player_weekly_results["name"] == "Tom Knuckey")
+            & (player_weekly_results["team_name"] == "Chelsea Dagger")
+            & (player_weekly_results["player_id"] == incoming_id)
+            & (player_weekly_results["gameweek"] == 5),
+            "goals",
+        ]
+        tom_gw4_roster = rosters.loc[
+            (rosters["team_name"] == "Chelsea Dagger")
+            & (rosters["gameweek"] == 4),
+            "player_id",
+        ]
+        tom_gw5_roster = rosters.loc[
+            (rosters["team_name"] == "Chelsea Dagger")
+            & (rosters["gameweek"] == 5),
+            "player_id",
+        ]
+        detailed_totals = (
+            player_weekly_results.groupby(
+                ["name", "team_name", "gameweek"], dropna=False
+            )["goals"]
+            .sum()
+            .sort_index()
+        )
+        weekly_totals = weekly_results.set_index(
+            ["name", "team_name", "gameweek"]
+        )["goals"].sort_index()
+
+        self.assertIn(outgoing_id, tom_gw4_roster.tolist())
+        self.assertNotIn(outgoing_id, tom_gw5_roster.tolist())
+        self.assertIn(incoming_id, tom_gw5_roster.tolist())
+        self.assertEqual(tom_gw5_hurtre_points.tolist(), [1.0])
+        pd.testing.assert_series_equal(
+            detailed_totals,
+            weekly_totals,
+            check_names=False,
+        )
 
 
 if __name__ == "__main__":

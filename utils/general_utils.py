@@ -629,14 +629,14 @@ def build_weekly_rosters(
     return pd.concat(roster_rows, ignore_index=True)
 
 
-def calculate_weekly_results(
+def calculate_player_weekly_results(
     picks: pd.DataFrame,
     gameweek_goals: pd.DataFrame,
     roster_path: str | Path | None = None,
     max_gameweek: int | None = None,
     transfer_rules: Iterable[TransferRule] | None = None,
 ) -> pd.DataFrame:
-    """Calculate manager goals from gameweek-level roster ownership."""
+    """Return each manager's per-player goals for every gameweek."""
     if not {"name", "team_name", "player_id"}.issubset(picks.columns):
         raise ValueError("Picks must contain name, team_name, and player_id.")
     if not {"player_id", "gameweek", "goals"}.issubset(gameweek_goals.columns):
@@ -656,9 +656,10 @@ def calculate_weekly_results(
         gameweeks = pd.DataFrame({"gameweek": range(1, max_gameweek + 1)})
         rosters = roster_keys.merge(gameweeks, how="cross")
 
+    team_managers = picks[["name", "team_name"]].drop_duplicates()
     weekly_ownership = rosters.merge(
-        picks[["name", "team_name", "player_id"]],
-        on=["team_name", "player_id"],
+        team_managers,
+        on="team_name",
         how="inner",
         validate="many_to_many",
     )
@@ -676,9 +677,34 @@ def calculate_weekly_results(
     weekly_ownership["goals"] = weekly_ownership["goals"] / weekly_ownership["ownership_count"]
 
     return (
-        weekly_ownership.groupby(["name", "team_name", "gameweek"], dropna=False)[
-            "goals"
-        ]
+        weekly_ownership.groupby(
+            ["name", "team_name", "player_id", "gameweek"], dropna=False
+        )["goals"]
+        .sum()
+        .round(2)
+        .reset_index()
+    )
+
+
+def calculate_weekly_results(
+    picks: pd.DataFrame,
+    gameweek_goals: pd.DataFrame,
+    roster_path: str | Path | None = None,
+    max_gameweek: int | None = None,
+    transfer_rules: Iterable[TransferRule] | None = None,
+) -> pd.DataFrame:
+    """Calculate manager goals from gameweek-level roster ownership."""
+    player_weekly_results = calculate_player_weekly_results(
+        picks,
+        gameweek_goals,
+        roster_path=roster_path,
+        max_gameweek=max_gameweek,
+        transfer_rules=transfer_rules,
+    )
+    return (
+        player_weekly_results.groupby(
+            ["name", "team_name", "gameweek"], dropna=False
+        )["goals"]
         .sum()
         .round(2)
         .reset_index()
