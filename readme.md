@@ -33,6 +33,16 @@ The first stage reads form responses and player reference data from `data/input/
 
 The selected data source and other pipeline options are in `config.py`; it currently selects `actual`. Check this setting before running the pipeline: generated CSVs in the selected output directory may be replaced.
 
+## Optional Local Player Descriptions
+
+After running the pipeline, install and start [Ollama](https://ollama.com/) and download the local model once:
+
+```powershell
+ollama pull llama3.2:3b
+```
+
+Open `player_descriptions.ipynb` from the repository root and run its cells. It reads the player reference, gameweek goal CSVs, and generated `player_pics.csv`, then writes or overwrites `data/output/<data_source>/player_descriptions.csv` with descriptions only for players who have scored or been picked. The model runs locally; the description CSV is not loaded by Streamlit.
+
 ## Input Data
 
 Each data source has `form_response.csv`, `player_reference.csv`, and a `player_goals/` directory under `data/input/<data_source>/`. Use the stable `player_id` from the reference data to identify players across files.
@@ -52,5 +62,6 @@ A blank `goals` value, or an omitted `goals` column, counts as one goal. Enter `
 
 - [Web app plan](docs/webapp_plan.md): current app status and planned participant-input workflow.
 - [Project plan](docs/plan_2026_09_17.md): priorities and outstanding improvements.
+- [Player description requirements](docs/player_descriptions_requirements.md): scope for the local weekly description notebook.
 - [Copilot project guidance](.github/copilot-instructions.md): concise repository context and working rules.
 - [Pipeline guidance](.github/instructions/data-pipeline.instructions.md) and [Streamlit guidance](.github/instructions/streamlit.instructions.md): task-scoped AI instructions.
