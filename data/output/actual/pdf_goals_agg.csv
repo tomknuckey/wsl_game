@@ -1,66 +1,73 @@
 player_id,goals,full_name,team
-WSL_0231,7,Khadija Shaw,Manchester City
+WSL_0231,8,Khadija Shaw,Manchester City
 WSL_0055,6,Océane Hurtré,Birmingham City
 WSL_0308,5,Victoria Pelova,Tottenham Hotspur
-WSL_0233,4,Lauren Hemp,Manchester City
 WSL_0110,4,Lauren James,Chelsea
-WSL_0289,3,Olivia Holdt,Tottenham Hotspur
+WSL_0265,4,Melvine Malard,Chelsea
+WSL_0069,4,Kiko Seike,Brighton and Hove Albion
+WSL_0233,4,Lauren Hemp,Manchester City
 WSL_0205,3,Daniëlle van de Donk,London City Lionesses
-WSL_0104,3,Ellie Carpenter,Chelsea
-WSL_0069,3,Kiko Seike,Brighton and Hove Albion
-WSL_0349,3,Alexia Putellas,London City Lionesses
-WSL_0274,3,Julia Zigiotti Olme,Manchester United
+WSL_0289,3,Olivia Holdt,Tottenham Hotspur
 WSL_0320,3,Viviane Asseyi,West Ham
-WSL_0265,2,Melvine Malard,Chelsea
-WSL_0177,2,Cornelia Kapocs,Liverpool
-WSL_0107,2,Sjoeke Nüsken,Chelsea
-WSL_0121,2,Keira Walsh,Chelsea
-WSL_0174,2,Grace Fisk,Liverpool
+WSL_0349,3,Alexia Putellas,London City Lionesses
+WSL_0340,3,Amalie Vangsgaard,Aston Villa
+WSL_0274,3,Julia Zigiotti Olme,Manchester United
+WSL_0104,3,Ellie Carpenter,Chelsea
+WSL_0356,3,Kadidiatou Diani,London City Lionesses
+WSL_0027,2,Noelle Maritz,Aston Villa
+WSL_0287,2,Signe Gaupset,Tottenham Hotspur
+WSL_0266,2,Elisabeth Terland,Manchester United
+WSL_0306,2,Kirsty Hanson,Tottenham Hotspur
+WSL_0296,2,Cathinka Tandberg,Tottenham Hotspur
+WSL_0358,2,Lexi Lloyd-Smith,Crystal Palace
+WSL_0339,2,Andrea Medina,Manchester United
+WSL_0337,2,Vivien Endemann,Liverpool
+WSL_0070,2,Fran Kirby,Brighton and Hove Albion
 WSL_0214,2,Isobel Goodwin,London City Lionesses
 WSL_0230,2,Mary Fowler,Manchester City
-WSL_0287,2,Signe Gaupset,Tottenham Hotspur
-WSL_0337,2,Vivien Endemann,Liverpool
-WSL_0339,2,Andrea Medina,Manchester United
-WSL_0358,2,Lexi Lloyd-Smith,Crystal Palace
-WSL_0356,2,Kadidiatou Diani,London City Lionesses
-WSL_0306,2,Kirsty Hanson,Tottenham Hotspur
 WSL_0212,2,Delphine Cascarino,London City Lionesses
+WSL_0208,2,Freya Godfrey,London City Lionesses
+WSL_0174,2,Grace Fisk,Liverpool
 WSL_0167,2,Ruby Mace,Everton
-WSL_0009,1,Smilla Holmberg,Arsenal
-WSL_0117,1,Niamh Charles,Manchester City
-WSL_0067,1,Maisie Symonds,Brighton and Hove Albion
+WSL_0121,2,Keira Walsh,Chelsea
+WSL_0107,2,Sjoeke Nüsken,Chelsea
+WSL_0180,2,Beata Olsson,Liverpool
+WSL_0177,2,Cornelia Kapocs,Liverpool
+WSL_0067,2,Maisie Symonds,Brighton and Hove Albion
 WSL_0043,1,Chasity Grant,Aston Villa
 WSL_0015,1,Olivia Smith,Arsenal
+WSL_0018,1,Alessia Russo,Arsenal
+WSL_0009,1,Smilla Holmberg,Arsenal
 WSL_0025,1,Lynn Wilms,Aston Villa
-WSL_0208,1,Freya Godfrey,London City Lionesses
+WSL_0052,1,Lily Crosthwaite,Birmingham City
+WSL_0049,1,Wilma Leidhammar,Birmingham City
+WSL_0226,1,Jade Rose,Manchester City
+WSL_0227,1,Alex Greenwood,Manchester City
+WSL_0192,1,Alice Bergström,Liverpool
 WSL_0193,1,Aurélie Csillag,Liverpool
 WSL_0197,1,Jana Fernández,London City Lionesses
 WSL_0202,1,Lucía Corrales,London City Lionesses
-WSL_0192,1,Alice Bergström,Liverpool
-WSL_0122,1,Lexi Potter,Chelsea
-WSL_0118,1,Lucy Bronze,Chelsea
-WSL_0180,1,Beata Olsson,Liverpool
-WSL_0140,1,Abbie Larkin,Crystal Palace
-WSL_0052,1,Lily Crosthwaite,Birmingham City
-WSL_0027,1,Noelle Maritz,Aston Villa
-WSL_0070,1,Fran Kirby,Brighton and Hove Albion
-WSL_0095,1,Jodie Hutton,Charlton Athletic
 WSL_0073,1,Caitlin Hayes,Brighton and Hove Albion
+WSL_0095,1,Jodie Hutton,Charlton Athletic
+WSL_0114,1,Sandy Baltimore,Chelsea
 WSL_0111,1,Alyssa Thompson,Chelsea
-WSL_0226,1,Jade Rose,Manchester City
-WSL_0296,1,Cathinka Tandberg,Tottenham Hotspur
-WSL_0290,1,Matilda Vinberg,Tottenham Hotspur
-WSL_0269,1,Simi Awujo,Manchester United
-WSL_0285,1,Amanda Nildén,Tottenham Hotspur
-WSL_0266,1,Elisabeth Terland,Manchester United
-WSL_0227,1,Alex Greenwood,Manchester City
-WSL_0238,1,Kerstin Casparij,Manchester City
-WSL_0263,1,Ella Toone,Manchester United
-WSL_0340,1,Amalie Vangsgaard,Aston Villa
+WSL_0117,1,Niamh Charles,Manchester City
+WSL_0118,1,Lucy Bronze,Chelsea
+WSL_0122,1,Lexi Potter,Chelsea
+WSL_0140,1,Abbie Larkin,Crystal Palace
 WSL_0307,1,Shekiera Martinez,Tottenham Hotspur
 WSL_0305,1,Caitlin Dijkstra,Tottenham Hotspur
+WSL_0285,1,Amanda Nildén,Tottenham Hotspur
+WSL_0290,1,Matilda Vinberg,Tottenham Hotspur
+WSL_0263,1,Ella Toone,Manchester United
+WSL_0238,1,Kerstin Casparij,Manchester City
+WSL_0269,1,Simi Awujo,Manchester United
+WSL_0284,1,Molly Bartrip,Crystal Palace
+WSL_0344,1,Georgia Stanway,Arsenal
 WSL_0341,1,Nicole Anyomi,London City Lionesses
-WSL_0355,1,Bethany England,Crystal Palace
+WSL_0354,1,Noémie Mouchon,Everton
 WSL_0353,1,Lisa Baum,Arsenal
+WSL_0355,1,Bethany England,Crystal Palace
 WSL_0357,1,Hannah Cain,Everton
+WSL_0366,1,Holly McNamara,Everton
 WSL_0373,1,Leah Davidson,Charlton Athletic
