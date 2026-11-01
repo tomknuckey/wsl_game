@@ -1,0 +1,85 @@
+data_source,player_id,full_name,team,current_season_goals,completed_gameweeks,goals_by_gameweek,scoring_gameweeks,brace_gameweeks,multi_goal_gameweeks,gameweeks_since_last_goal,ownership_count,last_season,last_season_goals,current_season_goal_rank,current_season_goal_rank_tie_count,ownership_rank,ownership_rank_tie_count
+actual,WSL_0018,Alessia Russo,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,4,2025-26,13.0,,,3.0,2.0
+actual,WSL_0016,Chloe Kelly,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,5.0,,,16.0,25.0
+actual,WSL_0344,Georgia Stanway,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,4,2025-26,,,,3.0,2.0
+actual,WSL_0012,Kim Little,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,,,,16.0,25.0
+actual,WSL_0353,Lisa Baum,Arsenal,1,6,"[1, 0, 0, 0, 0, 0]",[1],[],[],5.0,1,2025-26,,28.0,38.0,16.0,25.0
+actual,WSL_0011,Mariona Caldentey,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,2,2025-26,4.0,,,6.0,10.0
+actual,WSL_0020,Michelle Agyemang,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,1.0,,,16.0,25.0
+actual,WSL_0015,Olivia Smith,Arsenal,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,2,2025-26,5.0,28.0,38.0,6.0,10.0
+actual,WSL_0348,Selina Cerci,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,,,,16.0,25.0
+actual,WSL_0009,Smilla Holmberg,Arsenal,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,2.0,28.0,38.0,,
+actual,WSL_0019,Stina Blackstenius,Arsenal,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,10.0,,,16.0,25.0
+actual,WSL_0340,Amalie Vangsgaard,Aston Villa,1,6,"[0, 1, 0, 0, 0, 0]",[2],[],[],4.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0043,Chasity Grant,Aston Villa,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0025,Lynn Wilms,Aston Villa,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,2.0,28.0,38.0,,
+actual,WSL_0027,Noelle Maritz,Aston Villa,1,6,"[0, 0, 0, 0, 1, 0]",[5],[],[],1.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0038,Rachel Daly,Aston Villa,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,3.0,,,16.0,25.0
+actual,WSL_0052,Lily Crosthwaite,Birmingham City,1,6,"[0, 1, 0, 0, 0, 0]",[2],[],[],4.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0055,Océane Hurtré,Birmingham City,6,6,"[1, 1, 0, 2, 1, 1]","[1, 2, 4, 5, 6]",[4],"[{""gameweek"": 4, ""goals"": 2}]",0.0,0,2025-26,,2.0,1.0,,
+actual,WSL_0073,Caitlin Hayes,Brighton and Hove Albion,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0070,Fran Kirby,Brighton and Hove Albion,1,6,"[0, 0, 0, 0, 1, 0]",[5],[],[],1.0,1,2025-26,2.0,28.0,38.0,16.0,25.0
+actual,WSL_0069,Kiko Seike,Brighton and Hove Albion,3,6,"[0, 1, 0, 0, 2, 0]","[2, 5]",[5],"[{""gameweek"": 5, ""goals"": 2}]",1.0,1,2025-26,8.0,6.0,7.0,16.0,25.0
+actual,WSL_0067,Maisie Symonds,Brighton and Hove Albion,1,6,"[0, 0, 0, 0, 1, 0]",[5],[],[],1.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0338,Nadia Krezyman,Brighton and Hove Albion,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,,,,16.0,25.0
+actual,WSL_0095,Jodie Hutton,Charlton Athletic,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,1,2025-26,,28.0,38.0,16.0,25.0
+actual,WSL_0373,Leah Davidson,Charlton Athletic,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0123,Aggie Beever-Jones,Chelsea,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,4.0,,,16.0,25.0
+actual,WSL_0111,Alyssa Thompson,Chelsea,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,2,2025-26,7.0,28.0,38.0,6.0,10.0
+actual,WSL_0104,Ellie Carpenter,Chelsea,3,6,"[0, 1, 0, 0, 0, 2]","[2, 6]",[6],"[{""gameweek"": 6, ""goals"": 2}]",0.0,0,2025-26,2.0,6.0,7.0,,
+actual,WSL_0006,Katie McCabe,Chelsea,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,1.0,,,16.0,25.0
+actual,WSL_0121,Keira Walsh,Chelsea,2,6,"[0, 1, 0, 0, 1, 0]","[2, 5]",[],[],1.0,0,2025-26,2.0,13.0,15.0,,
+actual,WSL_0110,Lauren James,Chelsea,4,6,"[1, 1, 0, 0, 0, 2]","[1, 2, 6]",[6],"[{""gameweek"": 6, ""goals"": 2}]",0.0,0,2025-26,5.0,4.0,2.0,,
+actual,WSL_0122,Lexi Potter,Chelsea,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0118,Lucy Bronze,Chelsea,1,6,"[0, 1, 0, 0, 0, 0]",[2],[],[],4.0,1,2025-26,,28.0,38.0,16.0,25.0
+actual,WSL_0265,Melvine Malard,Chelsea,2,6,"[0, 0, 1, 0, 1, 0]","[3, 5]",[],[],1.0,0,2025-26,6.0,13.0,15.0,,
+actual,WSL_0107,Sjoeke Nüsken,Chelsea,2,6,"[0, 1, 0, 0, 0, 1]","[2, 6]",[],[],0.0,0,2025-26,2.0,13.0,15.0,,
+actual,WSL_0140,Abbie Larkin,Crystal Palace,1,6,"[0, 0, 0, 0, 1, 0]",[5],[],[],1.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0355,Bethany England,Crystal Palace,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,0,2025-26,7.0,28.0,38.0,,
+actual,WSL_0358,Lexi Lloyd-Smith,Crystal Palace,2,6,"[1, 0, 0, 1, 0, 0]","[1, 4]",[],[],2.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0357,Hannah Cain,Everton,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0366,Holly McNamara,Everton,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,,,,16.0,25.0
+actual,WSL_0167,Ruby Mace,Everton,2,6,"[0, 0, 0, 0, 2, 0]",[5],[5],"[{""gameweek"": 5, ""goals"": 2}]",1.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0192,Alice Bergström,Liverpool,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0193,Aurélie Csillag,Liverpool,1,6,"[0, 1, 0, 0, 0, 0]",[2],[],[],4.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0180,Beata Olsson,Liverpool,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,2,2025-26,6.0,28.0,38.0,6.0,10.0
+actual,WSL_0177,Cornelia Kapocs,Liverpool,2,6,"[1, 0, 0, 1, 0, 0]","[1, 4]",[],[],2.0,0,2025-26,2.0,13.0,15.0,,
+actual,WSL_0174,Grace Fisk,Liverpool,2,6,"[2, 0, 0, 0, 0, 0]",[1],[1],"[{""gameweek"": 1, ""goals"": 2}]",5.0,0,2025-26,1.0,13.0,15.0,,
+actual,WSL_0185,Jenna Clark,Liverpool,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,,,,16.0,25.0
+actual,WSL_0181,Mia Enderby,Liverpool,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,3.0,,,16.0,25.0
+actual,WSL_0337,Vivien Endemann,Liverpool,2,6,"[1, 0, 1, 0, 0, 0]","[1, 3]",[],[],3.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0349,Alexia Putellas,London City Lionesses,3,6,"[0, 0, 0, 1, 2, 0]","[4, 5]",[5],"[{""gameweek"": 5, ""goals"": 2}]",1.0,2,2025-26,,6.0,7.0,6.0,10.0
+actual,WSL_0205,Daniëlle van de Donk,London City Lionesses,3,6,"[1, 1, 0, 0, 1, 0]","[1, 2, 5]",[],[],1.0,1,2025-26,1.0,6.0,7.0,16.0,25.0
+actual,WSL_0212,Delphine Cascarino,London City Lionesses,2,6,"[0, 0, 0, 0, 1, 1]","[5, 6]",[],[],0.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0208,Freya Godfrey,London City Lionesses,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,2,2025-26,6.0,28.0,38.0,6.0,10.0
+actual,WSL_0214,Isobel Goodwin,London City Lionesses,2,6,"[0, 0, 2, 0, 0, 0]",[3],[3],"[{""gameweek"": 3, ""goals"": 2}]",3.0,1,2025-26,5.0,13.0,15.0,16.0,25.0
+actual,WSL_0197,Jana Fernández,London City Lionesses,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0356,Kadidiatou Diani,London City Lionesses,2,6,"[0, 0, 0, 0, 2, 0]",[5],[5],"[{""gameweek"": 5, ""goals"": 2}]",1.0,3,2025-26,,13.0,15.0,5.0,1.0
+actual,WSL_0202,Lucía Corrales,London City Lionesses,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0341,Nicole Anyomi,London City Lionesses,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,2,2025-26,,28.0,38.0,6.0,10.0
+actual,WSL_0210,Nikita Parris,London City Lionesses,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,4.0,,,16.0,25.0
+actual,WSL_0227,Alex Greenwood,Manchester City,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0242,Iman Beney,Manchester City,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,1,2025-26,2.0,,,16.0,25.0
+actual,WSL_0226,Jade Rose,Manchester City,1,6,"[0, 1, 0, 0, 0, 0]",[2],[],[],4.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0238,Kerstin Casparij,Manchester City,1,6,"[0, 0, 0, 0, 1, 0]",[5],[],[],1.0,1,2025-26,3.0,28.0,38.0,16.0,25.0
+actual,WSL_0231,Khadija Shaw,Manchester City,7,6,"[2, 1, 1, 0, 1, 2]","[1, 2, 3, 5, 6]","[1, 6]","[{""gameweek"": 1, ""goals"": 2}, {""gameweek"": 6, ""goals"": 2}]",0.0,9,2025-26,21.0,1.0,1.0,1.0,1.0
+actual,WSL_0233,Lauren Hemp,Manchester City,4,6,"[0, 0, 2, 0, 2, 0]","[3, 5]","[3, 5]","[{""gameweek"": 3, ""goals"": 2}, {""gameweek"": 5, ""goals"": 2}]",1.0,1,2025-26,1.0,4.0,2.0,16.0,25.0
+actual,WSL_0230,Mary Fowler,Manchester City,2,6,"[1, 1, 0, 0, 0, 0]","[1, 2]",[],[],4.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0117,Niamh Charles,Manchester City,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0232,Vivianne Miedema,Manchester City,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,2,2025-26,10.0,,,6.0,10.0
+actual,WSL_0339,Andrea Medina,Manchester United,2,6,"[0, 0, 0, 1, 0, 1]","[4, 6]",[],[],0.0,0,2025-26,,13.0,15.0,,
+actual,WSL_0266,Elisabeth Terland,Manchester United,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,2,2025-26,6.0,28.0,38.0,6.0,10.0
+actual,WSL_0263,Ella Toone,Manchester United,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,1,2025-26,3.0,28.0,38.0,16.0,25.0
+actual,WSL_0264,Jess Park,Manchester United,0,6,"[0, 0, 0, 0, 0, 0]",[],[],[],,2,2025-26,6.0,,,6.0,10.0
+actual,WSL_0274,Julia Zigiotti Olme,Manchester United,3,6,"[0, 0, 1, 0, 1, 1]","[3, 5, 6]",[],[],0.0,0,2025-26,2.0,6.0,7.0,,
+actual,WSL_0269,Simi Awujo,Manchester United,1,6,"[1, 0, 0, 0, 0, 0]",[1],[],[],5.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0285,Amanda Nildén,Tottenham Hotspur,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0305,Caitlin Dijkstra,Tottenham Hotspur,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,0,2025-26,,28.0,38.0,,
+actual,WSL_0296,Cathinka Tandberg,Tottenham Hotspur,1,6,"[0, 0, 0, 1, 0, 0]",[4],[],[],2.0,0,2025-26,6.0,28.0,38.0,,
+actual,WSL_0306,Kirsty Hanson,Tottenham Hotspur,2,6,"[2, 0, 0, 0, 0, 0]",[1],[1],"[{""gameweek"": 1, ""goals"": 2}]",5.0,5,2025-26,12.0,13.0,15.0,2.0,1.0
+actual,WSL_0290,Matilda Vinberg,Tottenham Hotspur,1,6,"[0, 0, 0, 0, 0, 1]",[6],[],[],0.0,0,2025-26,1.0,28.0,38.0,,
+actual,WSL_0289,Olivia Holdt,Tottenham Hotspur,3,6,"[0, 0, 3, 0, 0, 0]",[3],[],"[{""gameweek"": 3, ""goals"": 3}]",3.0,1,2025-26,8.0,6.0,7.0,16.0,25.0
+actual,WSL_0307,Shekiera Martinez,Tottenham Hotspur,1,6,"[0, 0, 1, 0, 0, 0]",[3],[],[],3.0,0,2025-26,6.0,28.0,38.0,,
+actual,WSL_0287,Signe Gaupset,Tottenham Hotspur,2,6,"[1, 0, 0, 0, 0, 1]","[1, 6]",[],[],0.0,0,2025-26,3.0,13.0,15.0,,
+actual,WSL_0308,Victoria Pelova,Tottenham Hotspur,5,6,"[0, 0, 2, 2, 1, 0]","[3, 4, 5]","[3, 4]","[{""gameweek"": 3, ""goals"": 2}, {""gameweek"": 4, ""goals"": 2}]",1.0,0,2025-26,,3.0,1.0,,
+actual,WSL_0320,Viviane Asseyi,West Ham,3,6,"[1, 1, 0, 1, 0, 0]","[1, 2, 4]",[],[],2.0,0,2025-26,2.0,6.0,7.0,,

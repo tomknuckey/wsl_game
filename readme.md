@@ -41,7 +41,15 @@ After running the pipeline, install and start [Ollama](https://ollama.com/) and 
 ollama pull llama3.2:3b
 ```
 
-Open `player_descriptions.ipynb` from the repository root and run its cells. It reads the player reference, gameweek goal CSVs, and generated `player_pics.csv`, then writes or overwrites `data/output/<data_source>/player_descriptions.csv` with descriptions only for players who have scored or been picked. The model runs locally; the description CSV is not loaded by Streamlit.
+After the standard pipeline has updated the weekly results and player ownership, generate ESPN data:
+
+```powershell
+python 3_generate_espn_data.py
+```
+
+The ESPN script validates all 132 completed 2025-26 WSL match summaries and saves prior-season non-own-goal scorer totals to `data/intermediate/<data_source>/espn_goals.csv`. Open `player_descriptions.ipynb` from the repository root and run its cells. The notebook validates the ESPN frame, player reference, consecutive weekly goal files, and `player_pics.csv`, prepares facts in memory, then generates and validates descriptions with local Ollama. No separate player-description Python script or prepared-facts CSV is needed. Its `MAX_PLAYERS_TO_GENERATE` setting can be set to `10` for a limited run or left as `None` to generate all eligible descriptions. After a successful run it overwrites `data/output/<data_source>/player_descriptions.csv`; a limited run therefore replaces that CSV with only the selected subset. Unknown prior-season totals stay blank. The description output is not loaded by Streamlit.
+
+This only runs when laptop isn't charging
 
 ## Input Data
 
