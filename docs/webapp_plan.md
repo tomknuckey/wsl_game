@@ -4,6 +4,8 @@
 
 The Streamlit app is hosted on Streamlit Community Cloud and displays generated results reports. It is read-only: participants cannot currently submit or change their player picks through the app. See `readme.md` for the live URL and local run instructions.
 
+The app also provides cumulative gameweek line charts for selected goal scorers and managers, defaulting to the top five of each. Manager weekly scores use the existing submitted picks for every gameweek and the same ownership-weighted scoring as the results report.
+
 ## Planned Participant Workflow
 
 The app should eventually let participants enter their picks through a normal web browser, without needing GitHub, Python, or Streamlit installed. Before treating that work as complete, verify that a participant can actually submit a valid set of picks and that the submission is incorporated into the results pipeline.

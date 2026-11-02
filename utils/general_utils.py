@@ -503,20 +503,21 @@ def resolve_duplicates_in_picks(
 
     return df
 
-def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
-    """Load and aggregate goal data across multiple gameweeks.
+def generate_weekly_goals(max_gw: int, data_source: str) -> pd.DataFrame:
+    """Load and aggregate goal data by player and gameweek.
 
     Reads goal CSVs from ``data/input/{data_source}/player_goals/GW_*.csv``
     for gameweeks 1 through ``max_gw`` (exclusive). The gameweek is read from
     each filename; blank or omitted goal counts default to one. Missing files
-    are skipped silently.
+    are skipped silently. Players absent from a week's file have no row for
+    that week and therefore no goals.
 
     Args:
         max_gw: Maximum gameweek number to attempt to load (exclusive).
         data_source: Directory name containing the player goals subdirectory.
 
     Returns:
-        DataFrame with columns ``player_id`` and ``goals`` (aggregated across all GWs).
+        DataFrame with columns ``player_id``, ``goals``, and ``gw``.
     """
     pdf_goals = []
     goals_dir = Path("data") / "input" / data_source / "player_goals"
@@ -541,11 +542,68 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
         pdf_goals.append(pdf_temp)
 
     if not pdf_goals:
-        return pd.DataFrame(columns=["player_id", "goals"])
+        return pd.DataFrame(columns=["player_id", "goals", "gw"])
 
     pdf_goals = pd.concat(pdf_goals, ignore_index=True)
 
-    return pdf_goals.groupby("player_id").agg({"goals": "sum"}).reset_index()
+    return (
+        pdf_goals.groupby(["player_id", "gw"], as_index=False)["goals"]
+        .sum()
+        .sort_values(["gw", "player_id"])
+        .reset_index(drop=True)
+    )
+
+
+def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
+    """Load and aggregate goal data across multiple gameweeks."""
+    pdf_weekly_goals = generate_weekly_goals(max_gw, data_source)
+    if pdf_weekly_goals.empty:
+        return pd.DataFrame(columns=["player_id", "goals"])
+
+    return pdf_weekly_goals.groupby("player_id", as_index=False)["goals"].sum()
+
+
+def generate_weekly_manager_results(
+    pdf_prep: pd.DataFrame,
+    pdf_pics: pd.DataFrame,
+    pdf_weekly_goals: pd.DataFrame,
+) -> pd.DataFrame:
+    """Calculate each manager's adjusted score for every gameweek.
+
+    Uses the same ownership-weighted goal adjustment as the season results:
+    each player's weekly goals are divided among all managers who picked them.
+    """
+    result_columns = ["name", "team_name", "gw", "goals"]
+    if pdf_prep.empty or pdf_pics.empty or pdf_weekly_goals.empty:
+        return pd.DataFrame(columns=result_columns)
+
+    manager_picks = pdf_prep[["player_id", "name", "team_name"]].copy()
+    player_pick_counts = pdf_pics[["player_id", "num_picks"]]
+    weekly_results = []
+
+    for gw, goals in pdf_weekly_goals.groupby("gw", sort=True):
+        manager_week = (
+            manager_picks.merge(
+                goals[["player_id", "goals"]], how="left", on="player_id"
+            )
+            .merge(player_pick_counts, how="left", on="player_id")
+        )
+        if manager_week["num_picks"].isna().any():
+            raise ValueError("Manager picks are missing player ownership counts.")
+
+        manager_week = adjust_goals(manager_week)
+        week_results = (
+            manager_week.groupby(["name", "team_name"], dropna=False)["goals"]
+            .sum()
+            .reset_index()
+        )
+        week_results["gw"] = int(gw)
+        weekly_results.append(week_results[result_columns])
+
+    if not weekly_results:
+        return pd.DataFrame(columns=result_columns)
+
+    return pd.concat(weekly_results, ignore_index=True)
 
 
 def generate_top_missed(pdf_goals_agg, pdf_pics, output_dir):
