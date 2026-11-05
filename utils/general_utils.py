@@ -1,8 +1,15 @@
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from utils.transfer_utils import (
+    TransferRule,
+    filter_transfer_records_for_rules,
+    load_transfer_records,
+)
 
 
 def _safe_str(val: Any, default: str = "") -> str:
@@ -503,109 +510,206 @@ def resolve_duplicates_in_picks(
 
     return df
 
-def generate_weekly_goals(max_gw: int, data_source: str) -> pd.DataFrame:
-    """Load and aggregate goal data by player and gameweek.
-
-    Reads goal CSVs from ``data/input/{data_source}/player_goals/GW_*.csv``
-    for gameweeks 1 through ``max_gw`` (exclusive). The gameweek is read from
-    each filename; blank or omitted goal counts default to one. Missing files
-    are skipped silently. Players absent from a week's file have no row for
-    that week and therefore no goals.
-
-    Args:
-        max_gw: Maximum gameweek number to attempt to load (exclusive).
-        data_source: Directory name containing the player goals subdirectory.
-
-    Returns:
-        DataFrame with columns ``player_id``, ``goals``, and ``gw``.
-    """
-    pdf_goals = []
-    goals_dir = Path("data") / "input" / data_source / "player_goals"
+def generate_gameweek_goals(
+    max_gw: int,
+    data_source: str,
+    goals_dir: str | Path | None = None,
+) -> pd.DataFrame:
+    """Load goal data, retaining the source gameweek for weekly scoring."""
+    goals_dir = Path(goals_dir) if goals_dir is not None else (
+        Path("data") / "input" / data_source / "player_goals"
+    )
+    gameweek_goals = []
 
     for file_path in sorted(goals_dir.glob("GW_*.csv")):
         try:
-            gw = int(file_path.stem.partition("_")[2])
+            gameweek = int(file_path.stem.partition("_")[2])
         except ValueError:
             continue
-        if not 1 <= gw < max_gw:
+        if not 1 <= gameweek < max_gw:
             continue
 
-        pdf_temp = pd.read_csv(file_path)
-        if "player_id" in pdf_temp.columns:
-            pdf_temp["player_id"] = pdf_temp["player_id"].astype(str).str.strip()
-        if "goals" not in pdf_temp.columns:
-            pdf_temp["goals"] = 1
+        frame = pd.read_csv(file_path)
+        frame["player_id"] = frame["player_id"].astype(str).str.strip()
+        if "goals" not in frame.columns:
+            frame["goals"] = 1
         else:
-            pdf_temp["goals"] = pdf_temp["goals"].replace(r"^\s*$", pd.NA, regex=True).fillna(1)
-            pdf_temp["goals"] = pd.to_numeric(pdf_temp["goals"], errors="coerce").fillna(0).astype(int)
-        pdf_temp["gw"] = gw
-        pdf_goals.append(pdf_temp)
+            frame["goals"] = (
+                frame["goals"]
+                .replace(r"^\s*$", pd.NA, regex=True)
+                .fillna(1)
+            )
+            frame["goals"] = pd.to_numeric(frame["goals"], errors="coerce").fillna(0).astype(int)
+        frame["gameweek"] = gameweek
+        gameweek_goals.append(frame[["player_id", "goals", "gameweek"]])
 
-    if not pdf_goals:
-        return pd.DataFrame(columns=["player_id", "goals", "gw"])
+    if not gameweek_goals:
+        return pd.DataFrame(columns=["player_id", "gameweek", "goals"])
 
-    pdf_goals = pd.concat(pdf_goals, ignore_index=True)
+    return pd.concat(gameweek_goals, ignore_index=True)
+
+def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
+    """Return the legacy season-wide goal aggregate."""
+    gameweek_goals = generate_gameweek_goals(max_gw, data_source)
+    if gameweek_goals.empty:
+        return pd.DataFrame(columns=["player_id", "goals"])
+
+    return gameweek_goals.groupby("player_id", as_index=False)["goals"].sum()
+
+
+def build_weekly_rosters(
+    picks: pd.DataFrame,
+    transfer_ledger_path: str | Path,
+    max_gameweek: int,
+    transfer_rules: Iterable[TransferRule] | None = None,
+) -> pd.DataFrame:
+    """Derive each team's roster for every gameweek from initial picks and transfers."""
+    required_columns = {"name", "team_name", "pick_slot", "player_id"}
+    if not required_columns.issubset(picks.columns):
+        raise ValueError("Picks must contain name, team_name, pick_slot, and player_id.")
+
+    initial_rosters = {}
+    for team_name, team_picks in picks.groupby("team_name", dropna=False):
+        roster = team_picks.drop_duplicates("player_id")["player_id"].astype(str).tolist()
+        if not roster or len(roster) != len(set(roster)):
+            raise ValueError(f"Initial roster for {team_name} is missing or duplicated.")
+        initial_rosters[str(team_name)] = roster
+
+    records = load_transfer_records(transfer_ledger_path)
+    if transfer_rules is not None:
+        records = filter_transfer_records_for_rules(records, transfer_rules)
+    transfers_by_team = {}
+    for record in records:
+        if record["action_type"] == "transfer":
+            transfers_by_team.setdefault(record["team_name"], []).append(record)
+
+    corrections_by_transfer_id = {
+        record["correction_of_transfer_id"]: record
+        for record in records
+        if record["action_type"] == "correction"
+        and record["correction_of_transfer_id"]
+    }
+
+    roster_rows = []
+    for team_name, initial_roster in initial_rosters.items():
+        for gameweek in range(1, max_gameweek + 1):
+            roster = list(initial_roster)
+            applicable_transfers = [
+                transfer
+                for transfer in transfers_by_team.get(team_name, [])
+                if int(transfer["effective_gameweek"]) <= gameweek
+            ]
+            applicable_transfers.sort(key=lambda item: item["submitted_at_utc"])
+            for transfer in applicable_transfers:
+                correction = corrections_by_transfer_id.get(transfer["transfer_id"])
+                if correction is None:
+                    outgoing_id = transfer["player_out_id"]
+                    incoming_id = transfer["player_in_id"]
+                else:
+                    original_outgoing_id = transfer["player_out_id"]
+                    original_incoming_id = transfer["player_in_id"]
+                    if (
+                        original_outgoing_id not in roster
+                        and original_incoming_id in roster
+                    ):
+                        roster[roster.index(original_incoming_id)] = original_outgoing_id
+                    outgoing_id = correction["player_out_id"]
+                    incoming_id = correction["player_in_id"]
+                if outgoing_id in roster:
+                    roster[roster.index(outgoing_id)] = incoming_id
+            roster_rows.append(
+                pd.DataFrame(
+                    {
+                        "team_name": team_name,
+                        "gameweek": gameweek,
+                        "player_id": roster,
+                    }
+                )
+            )
+
+    return pd.concat(roster_rows, ignore_index=True)
+
+
+def calculate_player_weekly_results(
+    picks: pd.DataFrame,
+    gameweek_goals: pd.DataFrame,
+    roster_path: str | Path | None = None,
+    max_gameweek: int | None = None,
+    transfer_rules: Iterable[TransferRule] | None = None,
+) -> pd.DataFrame:
+    """Return each manager's per-player goals for every gameweek."""
+    if not {"name", "team_name", "player_id"}.issubset(picks.columns):
+        raise ValueError("Picks must contain name, team_name, and player_id.")
+    if not {"player_id", "gameweek", "goals"}.issubset(gameweek_goals.columns):
+        raise ValueError("Gameweek goals must contain player_id, gameweek, and goals.")
+
+    if max_gameweek is None:
+        max_gameweek = int(gameweek_goals["gameweek"].max()) if not gameweek_goals.empty else 1
+    if roster_path is not None:
+        rosters = build_weekly_rosters(
+            picks,
+            roster_path,
+            max_gameweek,
+            transfer_rules=transfer_rules,
+        )
+    else:
+        roster_keys = picks[["team_name", "player_id"]].drop_duplicates()
+        gameweeks = pd.DataFrame({"gameweek": range(1, max_gameweek + 1)})
+        rosters = roster_keys.merge(gameweeks, how="cross")
+
+    team_managers = picks[["name", "team_name"]].drop_duplicates()
+    weekly_ownership = rosters.merge(
+        team_managers,
+        on="team_name",
+        how="inner",
+        validate="many_to_many",
+    )
+    player_owner_counts = weekly_ownership.groupby(
+        ["gameweek", "player_id"]
+    )["name"].transform("nunique")
+    weekly_ownership["ownership_count"] = player_owner_counts
+    weekly_ownership = weekly_ownership.merge(
+        gameweek_goals[["player_id", "gameweek", "goals"]],
+        on=["player_id", "gameweek"],
+        how="left",
+        validate="many_to_many",
+    )
+    weekly_ownership["goals"] = weekly_ownership["goals"].fillna(0)
+    weekly_ownership["goals"] = weekly_ownership["goals"] / weekly_ownership["ownership_count"]
 
     return (
-        pdf_goals.groupby(["player_id", "gw"], as_index=False)["goals"]
+        weekly_ownership.groupby(
+            ["name", "team_name", "player_id", "gameweek"], dropna=False
+        )["goals"]
         .sum()
-        .sort_values(["gw", "player_id"])
-        .reset_index(drop=True)
+        .round(2)
+        .reset_index()
     )
 
 
-def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
-    """Load and aggregate goal data across multiple gameweeks."""
-    pdf_weekly_goals = generate_weekly_goals(max_gw, data_source)
-    if pdf_weekly_goals.empty:
-        return pd.DataFrame(columns=["player_id", "goals"])
-
-    return pdf_weekly_goals.groupby("player_id", as_index=False)["goals"].sum()
-
-
-def generate_weekly_manager_results(
-    pdf_prep: pd.DataFrame,
-    pdf_pics: pd.DataFrame,
-    pdf_weekly_goals: pd.DataFrame,
+def calculate_weekly_results(
+    picks: pd.DataFrame,
+    gameweek_goals: pd.DataFrame,
+    roster_path: str | Path | None = None,
+    max_gameweek: int | None = None,
+    transfer_rules: Iterable[TransferRule] | None = None,
 ) -> pd.DataFrame:
-    """Calculate each manager's adjusted score for every gameweek.
-
-    Uses the same ownership-weighted goal adjustment as the season results:
-    each player's weekly goals are divided among all managers who picked them.
-    """
-    result_columns = ["name", "team_name", "gw", "goals"]
-    if pdf_prep.empty or pdf_pics.empty or pdf_weekly_goals.empty:
-        return pd.DataFrame(columns=result_columns)
-
-    manager_picks = pdf_prep[["player_id", "name", "team_name"]].copy()
-    player_pick_counts = pdf_pics[["player_id", "num_picks"]]
-    weekly_results = []
-
-    for gw, goals in pdf_weekly_goals.groupby("gw", sort=True):
-        manager_week = (
-            manager_picks.merge(
-                goals[["player_id", "goals"]], how="left", on="player_id"
-            )
-            .merge(player_pick_counts, how="left", on="player_id")
-        )
-        if manager_week["num_picks"].isna().any():
-            raise ValueError("Manager picks are missing player ownership counts.")
-
-        manager_week = adjust_goals(manager_week)
-        week_results = (
-            manager_week.groupby(["name", "team_name"], dropna=False)["goals"]
-            .sum()
-            .reset_index()
-        )
-        week_results["gw"] = int(gw)
-        weekly_results.append(week_results[result_columns])
-
-    if not weekly_results:
-        return pd.DataFrame(columns=result_columns)
-
-    return pd.concat(weekly_results, ignore_index=True)
-
-
+    """Calculate manager goals from gameweek-level roster ownership."""
+    player_weekly_results = calculate_player_weekly_results(
+        picks,
+        gameweek_goals,
+        roster_path=roster_path,
+        max_gameweek=max_gameweek,
+        transfer_rules=transfer_rules,
+    )
+    return (
+        player_weekly_results.groupby(
+            ["name", "team_name", "gameweek"], dropna=False
+        )["goals"]
+        .sum()
+        .round(2)
+        .reset_index()
+    )
 def generate_top_missed(pdf_goals_agg, pdf_pics, output_dir):
 
     """ Generate a report of the top 20 players with goals scored but not picked by any manager."""
