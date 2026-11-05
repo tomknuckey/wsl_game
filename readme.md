@@ -33,23 +33,15 @@ The first stage reads form responses and player reference data from `data/input/
 
 The selected data source and other pipeline options are in `config.py`; it currently selects `actual`. Check this setting before running the pipeline: generated CSVs in the selected output directory may be replaced.
 
-## Optional Local Player Descriptions
+## Optional ESPN Data
 
-After running the pipeline, install and start [Ollama](https://ollama.com/) and download the local model once:
-
-```powershell
-ollama pull llama3.2:3b
-```
-
-After the standard pipeline has updated the weekly results and player ownership, generate ESPN data:
+Generate prior-season scorer data from ESPN:
 
 ```powershell
 python 3_generate_espn_data.py
 ```
 
-The ESPN script validates all 132 completed 2025-26 WSL match summaries and saves prior-season non-own-goal scorer totals to `data/intermediate/<data_source>/espn_goals.csv`. Open `player_descriptions.ipynb` from the repository root and run its cells. The notebook validates the ESPN frame, player reference, consecutive weekly goal files, and `player_pics.csv`, prepares facts in memory, then generates and validates descriptions with local Ollama. No separate player-description Python script or prepared-facts CSV is needed. Its `MAX_PLAYERS_TO_GENERATE` setting can be set to `10` for a limited run or left as `None` to generate all eligible descriptions. After a successful run it overwrites `data/output/<data_source>/player_descriptions.csv`; a limited run therefore replaces that CSV with only the selected subset. Unknown prior-season totals stay blank. The description output is not loaded by Streamlit.
-
-This only runs when laptop isn't charging
+The script validates ESPN's completed 2025-26 WSL match summaries and saves prior-season non-own-goal scorer totals to `data/intermediate/<data_source>/espn_goals.csv`. Check `config.py` before running it because the selected data source determines which intermediate file is replaced. Player-description generation has been retired; see [player description experiment learnings](docs/player_description_experiment.md) for the observed results and notes for any future attempt.
 
 ## Input Data
 
@@ -70,6 +62,6 @@ A blank `goals` value, or an omitted `goals` column, counts as one goal. Enter `
 
 - [Web app plan](docs/webapp_plan.md): current app status and planned participant-input workflow.
 - [Project plan](docs/plan_2026_09_17.md): priorities and outstanding improvements.
-- [Player description requirements](docs/player_descriptions_requirements.md): scope for the local weekly description notebook.
+- [Player description experiment learnings](docs/player_description_experiment.md): what the local LLM attempt showed and how to approach it if resumed.
 - [Copilot project guidance](.github/copilot-instructions.md): concise repository context and working rules.
 - [Pipeline guidance](.github/instructions/data-pipeline.instructions.md) and [Streamlit guidance](.github/instructions/streamlit.instructions.md): task-scoped AI instructions.
