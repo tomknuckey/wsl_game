@@ -33,6 +33,16 @@ The first stage reads form responses and player reference data from `data/input/
 
 The selected data source and other pipeline options are in `config.py`; it currently selects `actual`. Check this setting before running the pipeline: generated CSVs in the selected output directory may be replaced.
 
+## Optional ESPN Data
+
+Generate prior-season scorer data from ESPN:
+
+```powershell
+python 3_generate_espn_data.py
+```
+
+The script validates ESPN's completed 2025-26 WSL match summaries and saves prior-season non-own-goal scorer totals to `data/intermediate/<data_source>/espn_goals.csv`. Check `config.py` before running it because the selected data source determines which intermediate file is replaced. Player-description generation has been retired; see [player description experiment learnings](docs/player_description_experiment.md) for the observed results and notes for any future attempt.
+
 ## Input Data
 
 Each data source has `form_response.csv`, `player_reference.csv`, and a `player_goals/` directory under `data/input/<data_source>/`. Use the stable `player_id` from the reference data to identify players across files.
@@ -52,5 +62,6 @@ A blank `goals` value, or an omitted `goals` column, counts as one goal. Enter `
 
 - [Web app plan](docs/webapp_plan.md): current app status and planned participant-input workflow.
 - [Project plan](docs/plan_2026_09_17.md): priorities and outstanding improvements.
+- [Player description experiment learnings](docs/player_description_experiment.md): what the local LLM attempt showed and how to approach it if resumed.
 - [Copilot project guidance](.github/copilot-instructions.md): concise repository context and working rules.
 - [Pipeline guidance](.github/instructions/data-pipeline.instructions.md) and [Streamlit guidance](.github/instructions/streamlit.instructions.md): task-scoped AI instructions.
