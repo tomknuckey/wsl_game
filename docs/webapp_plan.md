@@ -2,13 +2,19 @@
 
 ## Current App
 
-The Streamlit app is hosted on Streamlit Community Cloud and displays generated results reports. It is read-only: participants cannot currently submit or change their player picks through the app. See `readme.md` for the live URL and local run instructions.
+The Streamlit app has a public Overall Results page and a Team Pics page protected by a unique team access code. Team Pics displays the team's current gameweek roster, allows the configured number of one-for-one transfers per team, and records them in `data/input/<data_source>/team_transfers.csv`. A transfer rule's UTC start and deadline bound submissions; records submitted before the start or at/after the deadline are excluded from rosters, results, and the transfer limit. Transfers are effective from the configured gameweek and can be corrected before the deadline while preserving the original transfer as an audit row. Results are scored from gameweek-level rosters and shared goal ownership.
+
+The CSV ledger is suitable for local inspection and testing, but Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Transfers must not be treated as production data until the ledger moves to persistent transactional storage with backups and recovery.
 
 The app also provides cumulative gameweek line charts for selected goal scorers and managers, defaulting to the top five of each. Manager weekly scores use the existing submitted picks for every gameweek and the same ownership-weighted scoring as the results report.
 
+Actual and test team access codes and transfer ledgers are stored separately under `data/input/<data_source>/`. Hosted Streamlit secrets should use separate `[actual_team_access_codes]` and `[test_team_access_codes]` tables. After signing in, participants can view their own player point totals and their player-by-gameweek points from the generated results reports.
+
 ## Planned Participant Workflow
 
-The app should eventually let participants enter their picks through a normal web browser, without needing GitHub, Python, or Streamlit installed. Before treating that work as complete, verify that a participant can actually submit a valid set of picks and that the submission is incorporated into the results pipeline.
+The participant signs in with the team access code, views the current gameweek roster, selects one outgoing and one incoming player through the same form to submit or update a transfer during the configured UTC window, and receives the effective gameweek and transfer status. The server validates roster membership, eligibility, the start and deadline, and the configured season transfer limit. Updates preserve the original transfer in the audit ledger; results use the latest selected pair.
+
+Before production use, define the persistent identity-to-team mapping, move the ledger to managed PostgreSQL or another transactional store, add deployment secrets for access codes and database credentials, and document backup and recovery procedures.
 
 ## Data Updates And Hosting
 

@@ -1,3 +1,4 @@
+import argparse
 import pandas as pd
 import random
 from config import (
@@ -30,10 +31,18 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 random.seed(42)
 
+parser = argparse.ArgumentParser(description="Prepare form picks for the selected data source.")
+parser.add_argument(
+    "--data-source",
+    default=data_source,
+    help=f"Data source directory under data/input (default: {data_source}).",
+)
+selected_data_source = parser.parse_args().data_source
+
 logging.info("Started Running")
 
 # Load form, rename columns, convert to long and clean
-pdf_form_raw = pd.read_csv(f"data/input/{data_source}/form_response.csv")
+pdf_form_raw = pd.read_csv(f"data/input/{selected_data_source}/form_response.csv")
 pdf_form = (
     pdf_form_raw.pipe(rename_form_columns)
     .pipe(form_to_long)
@@ -60,7 +69,9 @@ if manual_renaming_flag:
     pdf_form = pdf_form.pipe(apply_manual_renames, MANUAL_RENAMES)
 
 # Load reference
-pdf_reference = load_reference_sheet(f"data/input/{data_source}/player_reference.csv")
+pdf_reference = load_reference_sheet(
+    f"data/input/{selected_data_source}/player_reference.csv"
+)
 
 # Fill invalid picks with random players if enabled
 if player_fill_flag:
@@ -82,7 +93,7 @@ if errors:
     all_msgs = [f"ERROR: {e}" for e in errors]
     raise AssertionError("Validation failures:\n" + "\n".join(all_msgs))
 
-intermediate_dir = Path(f"data/intermediate/{data_source}")
+intermediate_dir = Path(f"data/intermediate/{selected_data_source}")
 intermediate_dir.mkdir(parents=True, exist_ok=True)
 
 pdf_form.to_csv(intermediate_dir / "player_pics.csv", index=False)

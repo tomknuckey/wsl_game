@@ -1,0 +1,2 @@
+team_name,season_id,rule_id,transfer_id,player_out_id,player_out_name,player_in_id,player_in_name,player_in_club,effective_gameweek,submitted_at_utc,action_type,correction_of_transfer_id,correction_reason
+Chelsea Dagger,test,test-GW5,test-gw5-miedema-hurtre,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,5,2026-10-06T18:00:00+00:00,transfer,,
