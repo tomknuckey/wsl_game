@@ -4,3 +4,4 @@ plotly
 pylint
 black
 streamlit
+gspread>=6,<7

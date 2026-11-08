@@ -68,7 +68,7 @@ For one transfer, derive each week's roster from the initial picks and the trans
 
 Continue using CSVs for gameweek goal inputs, the player reference during the transition, and generated reports. They are easy to inspect and fit the existing reporting pipeline.
 
-The transfer ledger is a source-specific CSV at `data/input/<data_source>/team_transfers.csv`. This is simple and inspectable for local use, and the app prevents a second transfer per team while running as a single process. CSV writes are not transactional across multiple app instances and Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Before relying on transfers in the hosted game, move the ledger to persistent transactional storage such as managed PostgreSQL; do not treat the deployed CSV as durable backup.
+The transfer ledger can be a source-specific CSV at `data/input/<data_source>/team_transfers.csv` or a private Google Sheets worksheet configured in Streamlit secrets. CSV is simple for local use, but Community Cloud's local filesystem is not durable across restarts or redeploys. Sheets persists rows and can be inspected easily, but is not transactional across multiple app instances; near-simultaneous submissions may race during transfer-limit checks. For stronger concurrent-write guarantees, use managed transactional storage such as PostgreSQL. The repository CSV is not automatically synchronized from Sheets.
 
 There is no need to migrate every existing dataset into the database. A small database-backed transfer workflow can coexist with the CSV reporting pipeline.
 

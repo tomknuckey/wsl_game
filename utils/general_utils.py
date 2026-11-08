@@ -7,6 +7,7 @@ import pandas as pd
 
 from utils.transfer_utils import (
     TransferRule,
+    TransferLedgerProtocol,
     filter_transfer_records_for_rules,
     load_transfer_records,
     normalise_team_name,
@@ -560,9 +561,10 @@ def generate_goals(max_gw: int, data_source: str) -> pd.DataFrame:
 
 def build_weekly_rosters(
     picks: pd.DataFrame,
-    transfer_ledger_path: str | Path,
+    transfer_ledger_path: str | Path | TransferLedgerProtocol,
     max_gameweek: int,
     transfer_rules: Iterable[TransferRule] | None = None,
+    transfer_records: list[dict[str, str]] | None = None,
 ) -> pd.DataFrame:
     """Derive each team's roster for every gameweek from initial picks and transfers."""
     required_columns = {"name", "team_name", "pick_slot", "player_id"}
@@ -576,7 +578,11 @@ def build_weekly_rosters(
             raise ValueError(f"Initial roster for {team_name} is missing or duplicated.")
         initial_rosters[str(team_name)] = roster
 
-    records = load_transfer_records(transfer_ledger_path)
+    records = (
+        load_transfer_records(transfer_ledger_path)
+        if transfer_records is None
+        else transfer_records
+    )
     if transfer_rules is not None:
         records = filter_transfer_records_for_rules(records, transfer_rules)
     transfers_by_team = {}

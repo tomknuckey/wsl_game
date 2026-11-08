@@ -4,7 +4,7 @@
 
 The Streamlit app has a public Overall Results page and a Team Pics page protected by a unique team access code. Team Pics displays the team's current gameweek roster, allows the configured number of one-for-one transfers per team, and records them in `data/input/<data_source>/team_transfers.csv`. A transfer rule's UTC start and deadline bound submissions; records submitted before the start or at/after the deadline are excluded from rosters, results, and the transfer limit. Transfers are effective from the configured gameweek and can be corrected before the deadline while preserving the original transfer as an audit row. Results are scored from gameweek-level rosters and shared goal ownership.
 
-The CSV ledger is suitable for local inspection and testing, but Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Transfers must not be treated as production data until the ledger moves to persistent transactional storage with backups and recovery.
+The transfer ledger supports local CSV storage and an optional private Google Sheets backend for hosted use. Community Cloud's local filesystem is not durable across restarts or redeploys. Google Sheets persists writes, but it does not provide transactional protection against simultaneous submissions. Configure the backend and migrate existing CSV rows before enabling Sheets. The repository CSV is not updated automatically and must be exported/copied and committed manually if it needs to stay current.
 
 The app also provides cumulative gameweek line charts for selected goal scorers and managers, defaulting to the top five of each. Manager weekly scores use the existing submitted picks for every gameweek and the same ownership-weighted scoring as the results report.
 
@@ -14,7 +14,7 @@ Actual and test team access codes and transfer ledgers are stored separately und
 
 The participant signs in with the team access code, views the current gameweek roster, selects one outgoing and one incoming player through the same form to submit or update a transfer during the configured UTC window, and receives the effective gameweek and transfer status. The server validates roster membership, eligibility, the start and deadline, and the configured season transfer limit. Updates preserve the original transfer in the audit ledger; results use the latest selected pair.
 
-Before production use, define the persistent identity-to-team mapping, move the ledger to managed PostgreSQL or another transactional store, add deployment secrets for access codes and database credentials, and document backup and recovery procedures.
+For stronger concurrent-write guarantees, consider moving the ledger to managed PostgreSQL or another transactional store. Protect service-account credentials in deployment secrets and maintain a backup/recovery process for the chosen storage backend.
 
 ## Data Updates And Hosting
 
