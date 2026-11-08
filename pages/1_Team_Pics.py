@@ -5,8 +5,12 @@ import pandas as pd
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
 from config import data_source, season_id, transfer_rules
-from utils.access_code_utils import authenticate_team, load_team_access_codes
-from utils.general_utils import build_weekly_rosters
+from utils.access_code_utils import (
+    authenticate_team,
+    load_team_access_codes,
+    team_access_codes_path,
+)
+from utils.general_utils import build_weekly_rosters, get_manager_performance
 from utils.transfer_utils import (
     filter_transfer_records_for_rules,
     format_utc_datetime,
@@ -21,11 +25,8 @@ from utils.transfer_utils import (
 
 st.set_page_config(page_title="Team Pics | WSL Fantasy Game", page_icon="⚽")
 DATA_INPUT_DIR = Path("data/input") / data_source
-TRANSFER_LEDGER_PATH = (
-    Path("data/team_transfers.csv")
-    if data_source == "actual"
-    else DATA_INPUT_DIR / "team_transfers.csv"
-)
+ACCESS_CODES_PATH = team_access_codes_path(data_source)
+TRANSFER_LEDGER_PATH = DATA_INPUT_DIR / "team_transfers.csv"
 
 
 @st.cache_data
@@ -58,12 +59,19 @@ if st.session_state["team_pics_team_name"] is None:
 
     if submitted:
         try:
-            secrets_mapping = st.secrets.get("team_access_codes", {})
+            secrets_mapping = st.secrets.get(
+                f"{data_source}_team_access_codes"
+            )
+            if secrets_mapping is None and data_source == "actual":
+                secrets_mapping = st.secrets.get("team_access_codes", {})
         except StreamlitSecretNotFoundError:
             secrets_mapping = {}
 
         try:
-            access_codes = load_team_access_codes(secrets_mapping=secrets_mapping)
+            access_codes = load_team_access_codes(
+                local_csv_path=ACCESS_CODES_PATH,
+                secrets_mapping=secrets_mapping,
+            )
         except (FileNotFoundError, ValueError):
             st.error("Team sign-in is not configured. Contact the game administrator.")
         else:
@@ -144,10 +152,10 @@ else:
         ["player_id"],
     ]
     initial_team_player_ids = team_picks["player_id"].tolist()
-    team_picks = team_picks.merge(
-        current_roster,
+    team_picks = current_roster.merge(
+        player_reference[["player_id", "full_name", "team"]],
+        how="left",
         on="player_id",
-        how="inner",
         validate="one_to_one",
     )
     current_rule_records = (
@@ -238,7 +246,7 @@ else:
     if team_picks.empty:
         st.info("No player picks were found for this team.")
     else:
-        display_picks = team_picks.sort_values("pick_slot").rename(
+        display_picks = team_picks.rename(
             columns={"full_name": "Player", "team": "Club"}
         )[["Player", "Club"]]
         st.dataframe(display_picks, use_container_width=True, hide_index=True)
@@ -370,6 +378,73 @@ else:
                             st.error(str(error))
                         else:
                             st.rerun()
+
+    st.header("Your Performance")
+    output_dir = Path("data/output") / data_source
+    player_points_path = output_dir / "manager_player_points.csv"
+    gameweek_points_path = output_dir / "manager_player_gameweek_points.csv"
+    missing_reports = [
+        path.name
+        for path in (player_points_path, gameweek_points_path)
+        if not path.is_file()
+    ]
+    if missing_reports:
+        st.info(
+            "Performance reports are not available yet: "
+            f"{', '.join(missing_reports)}."
+        )
+    else:
+        manager_player_points = pd.read_csv(player_points_path)
+        manager_player_gameweek_points = pd.read_csv(gameweek_points_path)
+        team_player_points, team_gameweek_points = get_manager_performance(
+            manager_player_points,
+            manager_player_gameweek_points,
+            selected_team,
+        )
+        player_tab, gameweek_tab = st.tabs(
+            ["Manager Player Points", "Manager Player Points by Gameweek"]
+        )
+        with player_tab:
+            if team_player_points.empty:
+                st.info("No player performance data is available for this team yet.")
+            else:
+                display_player_points = (
+                    team_player_points.rename(
+                        columns={
+                            "full_name": "Player",
+                            "team": "Club",
+                            "goals": "Points",
+                        }
+                    )
+                    .sort_values("Points", ascending=False)
+                    [["Player", "Club", "Points"]]
+                )
+                st.dataframe(
+                    display_player_points,
+                    use_container_width=True,
+                    hide_index=True,
+                )
+        with gameweek_tab:
+            if team_gameweek_points.empty:
+                st.info("No gameweek performance data is available for this team yet.")
+            else:
+                display_gameweek_points = (
+                    team_gameweek_points.rename(
+                        columns={
+                            "full_name": "Player",
+                            "team": "Club",
+                            "gameweek": "Gameweek",
+                            "goals": "Points",
+                        }
+                    )
+                    .sort_values(["Gameweek", "Player"])
+                    [["Gameweek", "Player", "Club", "Points"]]
+                )
+                st.dataframe(
+                    display_gameweek_points,
+                    use_container_width=True,
+                    hide_index=True,
+                )
 
     if st.button("Sign out"):
         st.session_state["team_pics_team_name"] = None

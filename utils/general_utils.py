@@ -9,6 +9,7 @@ from utils.transfer_utils import (
     TransferRule,
     filter_transfer_records_for_rules,
     load_transfer_records,
+    normalise_team_name,
 )
 
 
@@ -710,6 +711,30 @@ def calculate_weekly_results(
         .round(2)
         .reset_index()
     )
+
+
+def get_manager_performance(
+    manager_player_points: pd.DataFrame,
+    manager_player_gameweek_points: pd.DataFrame,
+    team_name: str,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Return one team's player totals and player points for each gameweek."""
+    team_key = normalise_team_name(team_name)
+    player_team_keys = manager_player_points["team_name"].map(
+        lambda value: normalise_team_name(str(value)) if pd.notna(value) else ""
+    )
+    weekly_team_keys = manager_player_gameweek_points["team_name"].map(
+        lambda value: normalise_team_name(str(value)) if pd.notna(value) else ""
+    )
+    team_player_points = manager_player_points.loc[
+        player_team_keys == team_key
+    ].copy()
+    team_gameweek_points = manager_player_gameweek_points.loc[
+        weekly_team_keys == team_key
+    ].copy()
+    return team_player_points, team_gameweek_points
+
+
 def generate_top_missed(pdf_goals_agg, pdf_pics, output_dir):
 
     """ Generate a report of the top 20 players with goals scored but not picked by any manager."""

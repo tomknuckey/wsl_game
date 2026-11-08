@@ -11,6 +11,7 @@ from utils.general_utils import (
     calculate_player_weekly_results,
     calculate_weekly_results,
     generate_gameweek_goals,
+    get_manager_performance,
 )
 from utils.transfer_utils import (
     TransferRule,
@@ -261,6 +262,54 @@ class WeeklyRosterTests(unittest.TestCase):
         goals = generate_gameweek_goals(11, "actual", goals_dir=Path(self.temp_directory.name))
 
         self.assertEqual(goals.to_dict("records"), [{"player_id": "A", "gameweek": 10, "goals": 2}])
+
+    def test_manager_performance_keeps_each_player_gameweek_row(self) -> None:
+        player_points = pd.DataFrame(
+            [
+                ["Manager A", "Chelsea Dagger", "P1", "Player One", "Club", 3.0],
+                ["Manager B", "Other Team", "P2", "Player Two", "Club", 8.0],
+            ],
+            columns=[
+                "name",
+                "team_name",
+                "player_id",
+                "full_name",
+                "team",
+                "goals",
+            ],
+        )
+        gameweek_points = pd.DataFrame(
+            [
+                ["Chelsea Dagger", "P1", "Player One", "Club", 1, 1.0],
+                ["  chelsea   dagger ", "P2", "Player Two", "Club", 1, 0.5],
+                ["Chelsea Dagger", "P1", "Player One", "Club", 2, 2.0],
+                ["Other Team", "P3", "Other Player", "Club", 1, 9.0],
+            ],
+            columns=[
+                "team_name",
+                "player_id",
+                "full_name",
+                "team",
+                "gameweek",
+                "goals",
+            ],
+        )
+
+        team_players, team_gameweeks = get_manager_performance(
+            player_points,
+            gameweek_points,
+            "Chelsea Dagger",
+        )
+
+        self.assertEqual(team_players["full_name"].tolist(), ["Player One"])
+        self.assertEqual(
+            team_gameweeks[["full_name", "gameweek", "goals"]].to_dict("records"),
+            [
+                {"full_name": "Player One", "gameweek": 1, "goals": 1.0},
+                {"full_name": "Player Two", "gameweek": 1, "goals": 0.5},
+                {"full_name": "Player One", "gameweek": 2, "goals": 2.0},
+            ],
+        )
 
     def test_test_fixture_miedema_transfer_awards_hurtre_gw5_goal(self) -> None:
         repository_root = Path(__file__).resolve().parents[1]

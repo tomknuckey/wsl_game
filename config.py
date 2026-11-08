@@ -1,6 +1,6 @@
 # Data source directory name
-data_source: str = "test"
-#data_source = "actual"
+#data_source: str = "test"
+data_source = "actual"
 # Entries submitted after this deadline are excluded from the results
 submission_deadline: str = "03/09/2026 20:00:00"
 
@@ -9,9 +9,9 @@ season_id: str = "2026-27"
 transfer_rules: list[dict] = [
     {
         "season_id": season_id,
-        "gameweek": 10,
+        "gameweek": 11,
         "start_utc": "2026-10-07T00:00:00Z",
-        "deadline_utc": "2026-11-12T20:00:00Z",
+        "deadline_utc": "2026-11-18T20:00:00Z",
         "max_transfers_per_team": 1,
     }
 ]

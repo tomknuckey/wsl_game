@@ -64,10 +64,8 @@ pdf_goals_agg.sort_values("goals", ascending=False).to_csv(output_dir / "pdf_goa
 generate_top_missed(pdf_goals_agg, pdf_pics, output_dir)
 generate_best_differential(pdf_pics, pdf_goals_agg, pdf_prep, output_dir)
 
-transfer_ledger_path = (
-    Path("data/team_transfers.csv")
-    if selected_data_source == "actual"
-    else Path("data/input") / selected_data_source / "team_transfers.csv"
+TRANSFER_LEDGER_PATH = (
+    Path("data/input") / selected_data_source / "team_transfers.csv"
 )
 last_gameweek_with_data = (
     int(pdf_goals_by_gameweek["gameweek"].max())
@@ -94,6 +92,11 @@ pdf_results = (
     .sum()
     .round(2)
     .reset_index()
+    .sort_values(
+        ["goals", "name", "team_name"],
+        ascending=[False, True, True],
+    )
+    .reset_index(drop=True)
 )
 pdf_results.to_csv(output_dir / "results.csv", index=False)
 

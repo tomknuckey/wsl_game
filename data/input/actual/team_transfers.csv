@@ -1,0 +1,4 @@
+team_name,season_id,rule_id,transfer_id,player_out_id,player_out_name,player_in_id,player_in_name,player_in_club,effective_gameweek,submitted_at_utc,action_type,correction_of_transfer_id,correction_reason
+Chelsea Dagger,2026-27,2026-27-GW11,9549611a-fef4-40ec-8bf0-7a59461d8f59,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,11,2026-11-08T13:06:59+00:00,transfer,,
+Chelsea Dagger,2026-27,2026-27-GW11,1a91cc3c-95be-46ce-b8de-64c1a505d390,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,11,2026-11-08T13:07:06+00:00,correction,9549611a-fef4-40ec-8bf0-7a59461d8f59,Updated by team during transfer window
+Chelsea Dagger,2026-27,2026-27-GW11,b58b1154-28ff-4d65-a254-924bb1f7567a,WSL_0232,Vivianne Miedema,WSL_0055,Océane Hurtré,Birmingham City,11,2026-11-08T13:07:13+00:00,correction,9549611a-fef4-40ec-8bf0-7a59461d8f59,Updated by team during transfer window

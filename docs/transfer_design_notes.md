@@ -6,7 +6,7 @@ The project currently has a batch data pipeline, a public Overall Results page, 
 
 1. `1_prepare_forms.py` cleans form responses and writes long-form player picks.
 2. `2_output_results.py` joins picks to player reference data and gameweek goals, then writes aggregate CSV reports.
-3. The Overall Results page displays public reports. The Team Pics page shows a team's picks, allows one saved one-player-out/one-player-in transfer per team, and records it in `data/team_transfers.csv`. The updated roster appears on Team Pics; scoring reports are not recalculated from the transfer yet.
+3. The Overall Results page displays public reports. The Team Pics page shows a team's picks, allows one saved one-player-out/one-player-in transfer per team, and records it in `data/input/<data_source>/team_transfers.csv`. The updated roster appears on Team Pics; scoring reports are not recalculated from the transfer yet.
 
 Player reference data has stable `player_id` values, but submitted picks are initially represented by player names. Managers are identified by submitted name and team name, rather than stable account IDs. Goal inputs are stored separately by gameweek, but the scoring helper aggregates goals across weeks before calculating manager results.
 
@@ -68,7 +68,7 @@ For one transfer, derive each week's roster from the initial picks and the trans
 
 Continue using CSVs for gameweek goal inputs, the player reference during the transition, and generated reports. They are easy to inspect and fit the existing reporting pipeline.
 
-The current requested transfer ledger is a CSV at `data/team_transfers.csv`. This is simple and inspectable for local use, and the app prevents a second transfer per team while running as a single process. CSV writes are not transactional across multiple app instances and Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Before relying on transfers in the hosted game, move the ledger to persistent transactional storage such as managed PostgreSQL; do not treat the deployed CSV as durable backup.
+The transfer ledger is a source-specific CSV at `data/input/<data_source>/team_transfers.csv`. This is simple and inspectable for local use, and the app prevents a second transfer per team while running as a single process. CSV writes are not transactional across multiple app instances and Streamlit Community Cloud's local filesystem is not durable across restarts or redeploys. Before relying on transfers in the hosted game, move the ledger to persistent transactional storage such as managed PostgreSQL; do not treat the deployed CSV as durable backup.
 
 There is no need to migrate every existing dataset into the database. A small database-backed transfer workflow can coexist with the CSV reporting pipeline.
 

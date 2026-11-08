@@ -50,8 +50,12 @@ def authenticate_team(
     return None
 
 
+def team_access_codes_path(source: str) -> Path:
+    return Path("data/input") / source / "team_access_codes.csv"
+
+
 def load_team_access_codes(
-    local_csv_path: str | Path = "data/team_access_codes.csv",
+    local_csv_path: str | Path = "data/input/actual/team_access_codes.csv",
     secrets_mapping: Mapping[str, str] | None = None,
 ) -> dict[str, str]:
     """Load private Streamlit secrets, or the local operator spreadsheet."""
