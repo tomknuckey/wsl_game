@@ -7,6 +7,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Protocol
 
 
 @dataclass(frozen=True)
@@ -153,11 +154,49 @@ TRANSFER_FIELDS = (
 _TRANSFER_LOCK = threading.Lock()
 
 
+class TransferLedgerProtocol(Protocol):
+    def load_transfer_records(self) -> list[dict[str, str]]:
+        """Return all ledger records."""
+
+    def append_transfer_record(self, record: Mapping[str, str]) -> None:
+        """Append a record and confirm it was persisted."""
+
+
 def normalise_team_name(team_name: str) -> str:
     return " ".join(team_name.split()).casefold()
 
 
-def load_transfer_records(path: str | Path) -> list[dict[str, str]]:
+def validate_transfer_records(
+    source_records: Iterable[Mapping[str, str]],
+) -> list[dict[str, str]]:
+    records = [dict(record) for record in source_records]
+    for record in records:
+        record.setdefault("season_id", "legacy")
+        record.setdefault("rule_id", "legacy")
+        record.setdefault("transfer_id", "")
+        record.setdefault("effective_gameweek", "10")
+        record.setdefault("action_type", "transfer")
+        record.setdefault("correction_of_transfer_id", "")
+        record.setdefault("correction_reason", "")
+        normalized_team = normalise_team_name(record["team_name"])
+        if not normalized_team:
+            raise ValueError("Transfer ledger contains a blank team name.")
+        if not record["player_out_id"] or not record["player_in_id"]:
+            raise ValueError("Transfer ledger contains a missing player ID.")
+        if record["player_out_id"] == record["player_in_id"]:
+            raise ValueError("A transfer must exchange two different players.")
+        if record["action_type"] not in {"transfer", "correction"}:
+            raise ValueError("Transfer ledger contains an invalid action type.")
+
+    return records
+
+
+def load_transfer_records(
+    path: str | Path | TransferLedgerProtocol,
+) -> list[dict[str, str]]:
+    if not isinstance(path, (str, Path)):
+        return path.load_transfer_records()
+
     transfer_path = Path(path)
     if not transfer_path.exists():
         return []
@@ -178,25 +217,27 @@ def load_transfer_records(path: str | Path) -> list[dict[str, str]]:
 
         records = [dict(row) for row in reader]
 
-    for record in records:
-        record.setdefault("season_id", "legacy")
-        record.setdefault("rule_id", "legacy")
-        record.setdefault("transfer_id", "")
-        record.setdefault("effective_gameweek", "10")
-        record.setdefault("action_type", "transfer")
-        record.setdefault("correction_of_transfer_id", "")
-        record.setdefault("correction_reason", "")
-        normalized_team = normalise_team_name(record["team_name"])
-        if not normalized_team:
-            raise ValueError("Transfer ledger contains a blank team name.")
-        if not record["player_out_id"] or not record["player_in_id"]:
-            raise ValueError("Transfer ledger contains a missing player ID.")
-        if record["player_out_id"] == record["player_in_id"]:
-            raise ValueError("A transfer must exchange two different players.")
-        if record["action_type"] not in {"transfer", "correction"}:
-            raise ValueError("Transfer ledger contains an invalid action type.")
+    return validate_transfer_records(records)
 
-    return records
+
+def _load_ledger_records(
+    ledger: str | Path | TransferLedgerProtocol,
+) -> list[dict[str, str]]:
+    if isinstance(ledger, (str, Path)):
+        return load_transfer_records(ledger)
+    return ledger.load_transfer_records()
+
+
+def _append_ledger_record(
+    ledger: str | Path | TransferLedgerProtocol,
+    records: list[dict[str, str]],
+    record: dict[str, str],
+) -> None:
+    if isinstance(ledger, (str, Path)):
+        _write_transfer_records(ledger, records + [record])
+        return
+    ledger.append_transfer_record(record)
+
 
 def _write_transfer_records(
     path: str | Path, records: list[dict[str, str]]
@@ -223,7 +264,7 @@ def _write_transfer_records(
 
 
 def record_correction(
-    path: str | Path,
+    path: str | Path | TransferLedgerProtocol,
     *,
     team_name: str,
     current_player_ids: Iterable[str],
@@ -251,9 +292,8 @@ def record_correction(
     if player_in_id in roster_ids or player_in_id == player_out_id:
         raise ValueError("The incoming player must be different and not already on the roster.")
 
-    transfer_path = Path(path)
     with _TRANSFER_LOCK:
-        existing_records = load_transfer_records(transfer_path)
+        existing_records = _load_ledger_records(path)
         original_transfer = next(
             (
                 record
@@ -291,7 +331,7 @@ def record_correction(
             "correction_of_transfer_id": original_transfer["transfer_id"],
             "correction_reason": correction_reason.strip(),
         }
-        _write_transfer_records(transfer_path, existing_records + [record])
+        _append_ledger_record(path, existing_records, record)
 
     return record
 
@@ -350,7 +390,7 @@ def get_active_team_transfer(
 
 
 def record_transfer(
-    path: str | Path,
+    path: str | Path | TransferLedgerProtocol,
     *,
     team_name: str,
     current_player_ids: Iterable[str],
@@ -422,10 +462,8 @@ def record_transfer(
         "correction_of_transfer_id": "",
         "correction_reason": "",
     }
-    transfer_path = Path(path)
-
     with _TRANSFER_LOCK:
-        existing_records = load_transfer_records(transfer_path)
+        existing_records = _load_ledger_records(path)
         prior_transfer_count = sum(
             1
             for existing_record in existing_records
@@ -443,6 +481,6 @@ def record_transfer(
                 f"This team has used all {rule.max_transfers_per_team} transfers "
                 f"for {rule.season_id}."
             )
-        _write_transfer_records(transfer_path, existing_records + [record])
+        _append_ledger_record(path, existing_records, record)
 
     return record

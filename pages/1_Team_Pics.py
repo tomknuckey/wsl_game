@@ -21,6 +21,7 @@ from utils.transfer_utils import (
     record_transfer,
     transfer_rules_from_config,
 )
+from utils.transfer_storage import TransferStorageError, get_transfer_ledger
 
 
 st.set_page_config(page_title="Team Pics | WSL Fantasy Game", page_icon="⚽")
@@ -129,22 +130,29 @@ else:
                 key=lambda rule: rule.deadline_datetime_utc,
             )
     ledger_valid = True
+    transfer_records = []
     try:
-        transfer_records = load_transfer_records(TRANSFER_LEDGER_PATH)
+        transfer_ledger = get_transfer_ledger(
+            data_source,
+            st.secrets,
+            TRANSFER_LEDGER_PATH,
+        )
+        transfer_records = load_transfer_records(transfer_ledger)
         transfer_records = filter_transfer_records_for_rules(
             transfer_records,
             configured_transfer_rules,
         )
-    except ValueError:
+    except (ValueError, TransferStorageError) as error:
         transfer_records = []
         ledger_valid = False
-        st.error("The transfer spreadsheet is invalid. Transfers are temporarily unavailable.")
+        st.error(f"Transfer storage is unavailable: {error}")
 
     weekly_rosters = build_weekly_rosters(
         picks,
         TRANSFER_LEDGER_PATH,
         max_gameweek=current_gameweek,
         transfer_rules=configured_transfer_rules,
+        transfer_records=transfer_records,
     )
     current_roster = weekly_rosters.loc[
         (weekly_rosters["team_name"] == selected_team)
@@ -348,7 +356,7 @@ else:
                         try:
                             if team_transfer is None:
                                 record_transfer(
-                                    TRANSFER_LEDGER_PATH,
+                                    transfer_ledger,
                                     team_name=selected_team,
                                     current_player_ids=transfer_selection_roster_ids,
                                     player_out_id=outgoing_player_id,
@@ -361,7 +369,7 @@ else:
                                 )
                             else:
                                 record_correction(
-                                    TRANSFER_LEDGER_PATH,
+                                    transfer_ledger,
                                     team_name=selected_team,
                                     current_player_ids=transfer_selection_roster_ids,
                                     player_out_id=outgoing_player_id,
@@ -374,7 +382,7 @@ else:
                                     effective_gameweek=active_transfer_rule.gameweek,
                                     rule=active_transfer_rule,
                                 )
-                        except ValueError as error:
+                        except (ValueError, TransferStorageError) as error:
                             st.error(str(error))
                         else:
                             st.rerun()
