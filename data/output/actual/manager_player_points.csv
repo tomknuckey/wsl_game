@@ -1,16 +1,16 @@
 name,team_name,player_id,full_name,team,goals
 Alice Teigh,Alice’s Angels,WSL_0349,Alexia Putellas,London City Lionesses,1.5
-Alice Teigh,Alice’s Angels,WSL_0180,Beata Olsson,Liverpool,1.0
-Alice Teigh,Alice’s Angels,WSL_0231,Khadija Shaw,Manchester City,0.99
-Alice Teigh,Alice’s Angels,WSL_0018,Alessia Russo,Arsenal,0.5
+Alice Teigh,Alice’s Angels,WSL_0180,Beata Olsson,Liverpool,1.5
+Alice Teigh,Alice’s Angels,WSL_0231,Khadija Shaw,Manchester City,1.32
+Alice Teigh,Alice’s Angels,WSL_0018,Alessia Russo,Arsenal,1.0
 Alice Teigh,Alice’s Angels,WSL_0015,Olivia Smith,Arsenal,0.5
+Amy Kanold-Madla,The Mead for Speed ,WSL_0231,Khadija Shaw,Manchester City,1.32
+Amy Kanold-Madla,The Mead for Speed ,WSL_0018,Alessia Russo,Arsenal,1.0
 Amy Kanold-Madla,The Mead for Speed ,WSL_0263,Ella Toone,Manchester United,1.0
-Amy Kanold-Madla,The Mead for Speed ,WSL_0231,Khadija Shaw,Manchester City,0.99
-Amy Kanold-Madla,The Mead for Speed ,WSL_0018,Alessia Russo,Arsenal,0.5
 Amy Kanold-Madla,The Mead for Speed ,WSL_0348,Selina Cerci,Arsenal,0.0
 Amy Kanold-Madla,The Mead for Speed ,WSL_0232,Vivianne Miedema,Manchester City,0.0
-Beth Lewis,Beth's Booming Army!,WSL_0356,Kadidiatou Diani,London City Lionesses,1.0
-Beth Lewis,Beth's Booming Army!,WSL_0231,Khadija Shaw,Manchester City,0.99
+Beth Lewis,Beth's Booming Army!,WSL_0356,Kadidiatou Diani,London City Lionesses,1.33
+Beth Lewis,Beth's Booming Army!,WSL_0231,Khadija Shaw,Manchester City,1.32
 Beth Lewis,Beth's Booming Army!,WSL_0306,Kirsty Hanson,Tottenham Hotspur,0.4
 Beth Lewis,Beth's Booming Army!,WSL_0344,Georgia Stanway,Arsenal,0.25
 Beth Lewis,Beth's Booming Army!,WSL_0019,Stina Blackstenius,Arsenal,0.0
@@ -19,42 +19,42 @@ Hannah Elizabeth Barker,Barker's Ballerz,WSL_0366,Holly McNamara,Everton,1.0
 Hannah Elizabeth Barker,Barker's Ballerz,WSL_0011,Mariona Caldentey,Arsenal,0.0
 Hannah Elizabeth Barker,Barker's Ballerz,WSL_0020,Michelle Agyemang,Arsenal,0.0
 Hannah Elizabeth Barker,Barker's Ballerz,WSL_0038,Rachel Daly,Aston Villa,0.0
-Holly Tidball,Shawshank Redemption,WSL_0289,Olivia Holdt,Tottenham Hotspur,4.0
-Holly Tidball,Shawshank Redemption,WSL_0231,Khadija Shaw,Manchester City,0.99
+Holly Tidball,Shawshank Redemption,WSL_0289,Olivia Holdt,Tottenham Hotspur,5.0
+Holly Tidball,Shawshank Redemption,WSL_0231,Khadija Shaw,Manchester City,1.32
 Holly Tidball,Shawshank Redemption,WSL_0341,Nicole Anyomi,London City Lionesses,0.5
 Holly Tidball,Shawshank Redemption,WSL_0306,Kirsty Hanson,Tottenham Hotspur,0.4
 Holly Tidball,Shawshank Redemption,WSL_0344,Georgia Stanway,Arsenal,0.25
 Ian Lewis,Five Star WFC,WSL_0349,Alexia Putellas,London City Lionesses,1.5
+Ian Lewis,Five Star WFC,WSL_0231,Khadija Shaw,Manchester City,1.32
 Ian Lewis,Five Star WFC,WSL_0266,Elisabeth Terland,Manchester United,1.0
-Ian Lewis,Five Star WFC,WSL_0231,Khadija Shaw,Manchester City,0.99
 Ian Lewis,Five Star WFC,WSL_0111,Alyssa Thompson,Chelsea,0.5
 Ian Lewis,Five Star WFC,WSL_0015,Olivia Smith,Arsenal,0.5
-Janine Lewis,Mama's Angels,WSL_0356,Kadidiatou Diani,London City Lionesses,1.0
-Janine Lewis,Mama's Angels,WSL_0231,Khadija Shaw,Manchester City,0.99
-Janine Lewis,Mama's Angels,WSL_0018,Alessia Russo,Arsenal,0.5
+Janine Lewis,Mama's Angels,WSL_0356,Kadidiatou Diani,London City Lionesses,1.33
+Janine Lewis,Mama's Angels,WSL_0231,Khadija Shaw,Manchester City,1.32
+Janine Lewis,Mama's Angels,WSL_0018,Alessia Russo,Arsenal,1.0
 Janine Lewis,Mama's Angels,WSL_0306,Kirsty Hanson,Tottenham Hotspur,0.4
 Janine Lewis,Mama's Angels,WSL_0338,Nadia Krezyman,Brighton and Hove Albion,0.0
 Jessica Luxford ,bend it like blackstenius ,WSL_0208,Freya Godfrey,London City Lionesses,1.0
+Jessica Luxford ,bend it like blackstenius ,WSL_0242,Iman Beney,Manchester City,1.0
 Jessica Luxford ,bend it like blackstenius ,WSL_0238,Kerstin Casparij,Manchester City,1.0
 Jessica Luxford ,bend it like blackstenius ,WSL_0344,Georgia Stanway,Arsenal,0.25
-Jessica Luxford ,bend it like blackstenius ,WSL_0242,Iman Beney,Manchester City,0.0
 Jessica Luxford ,bend it like blackstenius ,WSL_0264,Jess Park,Manchester United,0.0
 Megan Luxford,Kcc me rollin',WSL_0205,Daniëlle van de Donk,London City Lionesses,3.0
-Megan Luxford,Kcc me rollin',WSL_0180,Beata Olsson,Liverpool,1.0
+Megan Luxford,Kcc me rollin',WSL_0180,Beata Olsson,Liverpool,1.5
+Megan Luxford,Kcc me rollin',WSL_0231,Khadija Shaw,Manchester City,1.32
 Megan Luxford,Kcc me rollin',WSL_0208,Freya Godfrey,London City Lionesses,1.0
-Megan Luxford,Kcc me rollin',WSL_0231,Khadija Shaw,Manchester City,0.99
 Megan Luxford,Kcc me rollin',WSL_0011,Mariona Caldentey,Arsenal,0.0
-Paddy Smith,UpTheImps,WSL_0356,Kadidiatou Diani,London City Lionesses,1.0
+Paddy Smith,UpTheImps,WSL_0356,Kadidiatou Diani,London City Lionesses,1.33
+Paddy Smith,UpTheImps,WSL_0231,Khadija Shaw,Manchester City,1.32
+Paddy Smith,UpTheImps,WSL_0018,Alessia Russo,Arsenal,1.0
 Paddy Smith,UpTheImps,WSL_0353,Lisa Baum,Arsenal,1.0
-Paddy Smith,UpTheImps,WSL_0231,Khadija Shaw,Manchester City,0.99
-Paddy Smith,UpTheImps,WSL_0018,Alessia Russo,Arsenal,0.5
 Paddy Smith,UpTheImps,WSL_0341,Nicole Anyomi,London City Lionesses,0.5
 Samuel Lewis,samuelowenlewis@gmail.com,WSL_0233,Lauren Hemp,Manchester City,5.0
 Samuel Lewis,samuelowenlewis@gmail.com,WSL_0095,Jodie Hutton,Charlton Athletic,1.0
 Samuel Lewis,samuelowenlewis@gmail.com,WSL_0016,Chloe Kelly,Arsenal,0.0
 Samuel Lewis,samuelowenlewis@gmail.com,WSL_0185,Jenna Clark,Liverpool,0.0
 Samuel Lewis,samuelowenlewis@gmail.com,WSL_0181,Mia Enderby,Liverpool,0.0
-Simon Watson,Simon’s Goal Diggers,WSL_0070,Fran Kirby,Brighton and Hove Albion,2.0
+Simon Watson,Simon’s Goal Diggers,WSL_0070,Fran Kirby,Brighton and Hove Albion,3.0
 Simon Watson,Simon’s Goal Diggers,WSL_0118,Lucy Bronze,Chelsea,1.0
 Simon Watson,Simon’s Goal Diggers,WSL_0006,Katie McCabe,Chelsea,0.0
 Simon Watson,Simon’s Goal Diggers,WSL_0012,Kim Little,Arsenal,0.0
@@ -65,7 +65,7 @@ Sophie Lewis,Sophie Lewis FC,WSL_0306,Kirsty Hanson,Tottenham Hotspur,0.4
 Sophie Lewis,Sophie Lewis FC,WSL_0344,Georgia Stanway,Arsenal,0.25
 Sophie Lewis,Sophie Lewis FC,WSL_0264,Jess Park,Manchester United,0.0
 Tom Knuckey,Chelsea Dagger,WSL_0069,Kiko Seike,Brighton and Hove Albion,4.0
+Tom Knuckey,Chelsea Dagger,WSL_0231,Khadija Shaw,Manchester City,1.32
 Tom Knuckey,Chelsea Dagger,WSL_0266,Elisabeth Terland,Manchester United,1.0
-Tom Knuckey,Chelsea Dagger,WSL_0231,Khadija Shaw,Manchester City,0.99
 Tom Knuckey,Chelsea Dagger,WSL_0306,Kirsty Hanson,Tottenham Hotspur,0.4
 Tom Knuckey,Chelsea Dagger,WSL_0232,Vivianne Miedema,Manchester City,0.0

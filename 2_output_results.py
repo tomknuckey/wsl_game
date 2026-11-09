@@ -75,7 +75,7 @@ last_gameweek_with_data = (
 player_weekly_results = calculate_player_weekly_results(
     pdf_prep,
     pdf_goals_by_gameweek,
-    roster_path=transfer_ledger_path,
+    roster_path=TRANSFER_LEDGER_PATH,
     max_gameweek=last_gameweek_with_data,
     transfer_rules=transfer_rules_from_config(transfer_rules),
 )
