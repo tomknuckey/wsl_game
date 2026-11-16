@@ -2,7 +2,10 @@
 
 All notable changes to the WSL Game are documented here.
 
-## ## [1.2.0] - 2026-11-08
+## [1.2.1] - 2026-11-16
+- Showed players transfers, based on most bought, most sold and most succesful
+
+## [1.2.0] - 2026-11-08
 - Added transfer functionality allowing 1 transfer for GW 11, connecting transfers to google sheets
 - Showed how many points each player has scored for each player per week
 - LLM experiment, added data showing last seasons goals and a write up on LLM experiment
